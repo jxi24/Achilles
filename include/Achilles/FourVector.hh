@@ -24,7 +24,7 @@ class FourVector {
         ///@{
 
         /// Create an empty FourVector object
-        constexpr FourVector() noexcept : vec({0, 0, 0, 0}) {}
+        constexpr FourVector() noexcept : vec({{0, 0, 0, 0}}) {}
         /// Create a ThreeVector object with values given by p
         ///@param p: A std::array<double, 4> containing the values for the vector
         constexpr FourVector(std::array<double, 4> p) noexcept : vec(p) {}
@@ -34,7 +34,7 @@ class FourVector {
         ///@param pZ: The pz value of the vector
         ///@param E: The E value of the vector
         constexpr FourVector(double E, double pX, double pY, double pZ) noexcept 
-            : vec({E, pX, pY, pZ}) {}
+            : vec({{E, pX, pY, pZ}}) {}
         /// Create a FourVector object from a ThreeVector and an energy
         ///@param other: ThreeVector object containing 3-momentum information
         ///@param E: Energy for the given vector
@@ -66,7 +66,7 @@ class FourVector {
         ///@param pZ: momentum in the z-direction to be stored
         ///@param E: energy to be stored
         void SetPxPyPzE(const double& pX, const double& pY, const double& pZ, const double& E) noexcept {
-            vec = std::array<double, 4>{E, pX, pY, pZ};
+            vec = std::array<double, 4>{{E, pX, pY, pZ}};
         }
 
         /// Set the four momentum variable given a three momentum and a mass

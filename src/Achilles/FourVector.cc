@@ -8,7 +8,7 @@ using achilles::FourVector;
 using achilles::ThreeVector;
 
 FourVector::FourVector(const ThreeVector& other, const double& E) noexcept
-    : vec({E, other[0], other[1], other[2]}) {}
+    : vec({{E, other[0], other[1], other[2]}}) {}
 
 double FourVector::M() const noexcept {
     return std::sqrt(M2());
@@ -108,9 +108,9 @@ achilles::FourVector::RotMat FourVector::Align(const ThreeVector &axis) const no
     auto v = a.Cross(axis);
     double c = a.Dot(axis);
 
-    return {1-v[1]*v[1]/(1+c)-v[2]*v[2]/(1+c), -v[2]+v[0]*v[1]/(1+c), v[1]+v[0]*v[2]/(1+c),
+    return {{1-v[1]*v[1]/(1+c)-v[2]*v[2]/(1+c), -v[2]+v[0]*v[1]/(1+c), v[1]+v[0]*v[2]/(1+c),
             v[2]+v[0]*v[1]/(1+c), 1-v[0]*v[0]/(1+c)-v[2]*v[2]/(1+c), -v[0]+v[1]*v[2]/(1+c),
-            -v[1]+v[0]*v[2]/(1+c), v[0]+v[1]*v[2]/(1+c), 1-v[0]*v[0]/(1+c)-v[1]*v[1]/(1+c)};
+            -v[1]+v[0]*v[2]/(1+c), v[0]+v[1]*v[2]/(1+c), 1-v[0]*v[0]/(1+c)-v[1]*v[1]/(1+c)}};
 }
 
 achilles::FourVector::RotMat FourVector::AlignZ() const noexcept {

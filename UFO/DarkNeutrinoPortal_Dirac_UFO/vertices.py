@@ -930,7 +930,7 @@ V_153 = Vertex(name = 'V_153',
                lorentz = [ L.FFV1 ],
                couplings = {(0,0,0):C.GC_97, (0,0,1):C.GC_98,
                             (0,0,2):C.GC_97, (0,0,3):C.GC_98,
-                            (0,0,4):C.GC_98},
+                            (0,0,4):C.GC_99},
                form_factors = [ 'F1p', 'F1n', 'F2p', 'F2n', 'FA' ])
 
 V_154 = Vertex(name = 'V_154',

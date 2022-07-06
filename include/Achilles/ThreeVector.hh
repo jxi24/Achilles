@@ -21,7 +21,7 @@ class ThreeVector {
         ///@{
 
         /// Create an empty ThreeVector object
-        ThreeVector() noexcept : vec({0, 0, 0}) {}
+        ThreeVector() noexcept : vec({{0, 0, 0}}) {}
         /// Create a ThreeVector object with values given by p
         ///@param p: A std::array<double, 3> containing the values for the vector
         ThreeVector(std::array<double, 3> p) noexcept : vec(p) {}
@@ -29,7 +29,7 @@ class ThreeVector {
         ///@param pX: The x value of the vector
         ///@param pY: The y value of the vector
         ///@param pZ: The z value of the vector
-        ThreeVector(double pX, double pY, double pZ) noexcept : vec({pX, pY, pZ}) {}
+        ThreeVector(double pX, double pY, double pZ) noexcept : vec({{pX, pY, pZ}}) {}
         /// Create a copy of a ThreeVector object
         ///@param other: The vector to be copied
         ThreeVector(const ThreeVector& other) noexcept = default;
@@ -62,7 +62,7 @@ class ThreeVector {
         ///@param y: position in the y-direction to be stored
         ///@param z: position in the z-direction to be stored
         void SetXYZ(const double& x, const double& y, const double& z) noexcept {
-            vec = std::array<double, 3>{x, y, z};
+            vec = std::array<double, 3>{{x, y, z}};
         }
 
         /// Set position variable based on pased in array
@@ -76,7 +76,7 @@ class ThreeVector {
         ///@param pY: momentum in the y-direction to be stored
         ///@param pZ: momentum in the z-direction to be stored
         void SetPxPyPz(const double& pX, const double& pY, const double& pZ) noexcept {
-            vec = std::array<double, 3>{pX, pY, pZ};
+            vec = std::array<double, 3>{{pX, pY, pZ}};
         }
 
         /// Set only the position in the x-direction

@@ -207,8 +207,36 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
 #endif
         }
     }
-    auto hadronCurrent = m_nuclear -> CalcCurrents(event, ffInfo);
 
+    auto lept_in = event.Momentum()[1];
+    auto lept_out = event.Momentum().back();
+    auto energy_in = lept_in.E();
+    auto energy_out = lept_out.E();
+    auto mom_in = lept_in.Vec3().Magnitude();
+    auto mom_out = lept_out.Vec3().Magnitude();
+    auto direction_in = lept_in.Vec3().Unit();
+    auto direction_out = lept_out.Vec3().Unit();
+    auto mass_in = lept_in.M();
+    auto mass_out = lept_out.M();
+
+    spdlog::info("{}", lept_out);
+    spdlog::info("{}", lept_in);
+
+    // calculate h_T
+    auto ht_vec = direction_out.Cross(direction_out.Cross(direction_in));
+    auto ht = FourVector(ht_vec, 0);
+
+    // calculate h_L
+    auto hl_vec = energy_in * direction_out;
+    auto hl = FourVector(hl_vec, mom_out) / mass_out;
+
+    auto hadronCurrent = m_nuclear -> CalcCurrents(event, ffInfo);
+    
+    // print out values to check
+    // spdlog::info("{}", hadronCurrent[0][0].size());
+    // throw;
+
+    // amps2[k] calculations
     std::vector<double> amps2(hadronCurrent.size());
     const size_t nlep_spins = leptonCurrent.begin()->second.size();
     const size_t nhad_spins = m_nuclear -> NSpins();
@@ -222,10 +250,6 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
                     for(size_t k = 0; k < hadronCurrent.size(); ++k) {
                         if(hadronCurrent[k].find(boson) != hadronCurrent[k].end()) {
                             amps[k] += sign*lcurrent.second[i][mu]*hadronCurrent[k][boson][j][mu];
-                            for(size_t nu = 0; nu < 4; ++nu) {
-                                // Calculate W^{\mu\nu}
-                                // Calculate L^{h}_{\mu\nu}
-                            }
                         }
                     }
                 }
@@ -235,6 +259,81 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
                 amps2[k] += std::norm(amps[k]);
         }
     }
+
+    // calc spin density matrix: amplitude (depends on k, i, j - nucleons and spins of all particles)
+
+    // W and L calculations
+    std::vector<std::array<std::array<std::complex<double>,4>,4>> hadronTensor(hadronCurrent.size());
+    std::array<std::array<std::complex<double>,4>,4> leptonTensor{};
+
+    for(size_t mu = 0; mu < 4; ++mu) {
+        for(size_t nu = 0; nu < 4; ++nu) {
+            // loop for gauge boson
+            for(const auto &lcurrent : leptonCurrent) {
+                auto boson = lcurrent.first; 
+                // loop for nucleon
+                for(size_t k = 0; k < hadronCurrent.size(); ++k) {
+                    if(hadronCurrent[k].find(boson) != hadronCurrent[k].end()) {
+                        // loop for spin - hadronic side
+                        for(size_t j = 0; j < nhad_spins; ++j) {
+                            // Calculate W^{\mu\nu}
+                            hadronTensor[k][mu][nu] += hadronCurrent[k][boson][j][mu] * std::conj(hadronCurrent[k][boson][j][nu]);
+                        }
+                    }
+                }
+                // loop for spins - leptonic side
+                for(size_t i = 0; i  < nlep_spins; ++i) {
+                    // Calculate L^{h}_{\mu\nu}
+                    leptonTensor[mu][nu] += lcurrent.second[i][mu] * std::conj(lcurrent.second[i][nu]); 
+                }
+            }
+
+        }    
+    }    
+
+    spdlog::info("{}", leptonTensor[0][0]);
+    spdlog::info("{}", leptonTensor[0][1]);
+    
+    // compare to eqn 2
+    // check to see if you got the right answer: contract hadronic tensor with leptonic tensor
+    // another set of for loops over k, mu and nu
+    // multiply L_munu by W_kmunu
+    // make sure appropriately handle the sign
+    // mu=nu=0 +1
+    // mu=0 or nu=0 -1
+    // every other case is +1
+    // L^alphabeta * W^munu * g_alphamu * g_betanu
+    // for each k should reproduce amps2[k]
+
+    // amps is a number for protons and a number for neutrons
+    // for taus, one is zero
+
+    // 4 combos of spins
+    // L_h by summing the 2 +'s with a + and a 2 -'s with a -
+
+    std::array<std::complex<double>, 2> contraction; 
+    // std::array<std::complex<double>, 2> contraction_amp;
+    for(size_t k = 0; k < hadronCurrent.size(); ++k) {
+        for(size_t mu = 0; mu < 4; ++mu) {
+            for(size_t nu = 0; nu < 4; ++nu) {
+                double mult = 1;
+                if ( ((mu == 0) && (nu != 0)) || ((mu != 0) && (nu == 0)) ) {
+                    mult = -1;
+                };
+                contraction[k] += mult * leptonTensor[mu][nu] * hadronTensor[k][mu][nu];
+            }
+        }
+        // contraction_amp[k] = std::abs(contraction[k]);
+    }
+
+    for(size_t k = 0; k < hadronCurrent.size(); ++k) {
+        spdlog::info("{}", k);
+        spdlog::info("{}", contraction[k]);
+        // spdlog::info("{}", contraction_amp[k]);
+        spdlog::info("{}", amps2[k]);
+    }
+
+    throw;
 
     // Contract W^{\mu\nu} with L_{\mu\nu} => Numerator of P_(L,T)
 
