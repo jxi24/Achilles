@@ -266,6 +266,9 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
     std::vector<std::array<std::array<std::complex<double>,4>,4>> hadronTensor(hadronCurrent.size());
     std::array<std::array<std::complex<double>,4>,4> leptonTensor{};
 
+    spdlog::info("{}", hadronTensor[0][0][0]);
+    spdlog::info("{}", leptonTensor[0][0]);
+
     for(size_t mu = 0; mu < 4; ++mu) {
         for(size_t nu = 0; nu < 4; ++nu) {
             // loop for gauge boson
@@ -273,6 +276,7 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
                 auto boson = lcurrent.first; 
                 // loop for nucleon
                 for(size_t k = 0; k < hadronCurrent.size(); ++k) {
+                    // if this statement is not true, hadronTensor[k][mu][nu] is zero, does that make sense?
                     if(hadronCurrent[k].find(boson) != hadronCurrent[k].end()) {
                         // loop for spin - hadronic side
                         for(size_t j = 0; j < nhad_spins; ++j) {
