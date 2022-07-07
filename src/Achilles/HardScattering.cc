@@ -219,9 +219,6 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
     auto mass_in = lept_in.M();
     auto mass_out = lept_out.M();
 
-    spdlog::info("{}", lept_out);
-    spdlog::info("{}", lept_in);
-
     // calculate h_T
     auto ht_vec = direction_out.Cross(direction_out.Cross(direction_in));
     auto ht = FourVector(ht_vec, 0);
@@ -231,10 +228,6 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
     auto hl = FourVector(hl_vec, mom_out) / mass_out;
 
     auto hadronCurrent = m_nuclear -> CalcCurrents(event, ffInfo);
-    
-    // print out values to check
-    // spdlog::info("{}", hadronCurrent[0][0].size());
-    // throw;
 
     // amps2[k] calculations
     std::vector<double> amps2(hadronCurrent.size());
@@ -291,10 +284,13 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
 
         }    
     }    
-
-    spdlog::info("{}", leptonTensor[0][0]);
-    spdlog::info("{}", leptonTensor[0][1]);
     
+
+    // check hand calculation of tensors
+    spdlog::info("{}", leptonTensor[0][0]);
+    double L_factor = (4 * M_PI) / (137 * pow((mom_in - mom_out), 2));
+    spdlog::info("{}", L_factor);
+
     // compare to eqn 2
     // check to see if you got the right answer: contract hadronic tensor with leptonic tensor
     // another set of for loops over k, mu and nu
