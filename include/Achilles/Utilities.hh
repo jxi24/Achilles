@@ -66,8 +66,11 @@ void tokenize(const std::string& str, ContainerT& tokens,
     }
 }
 
-class FourVector;
+constexpr int LeviCivita(const int i, const int j, const int k, const int l) {
+    return (i==j||i==k||i==l||j==k||j==l||k==l) ? 0 : -(i-j)*(i-k)*(i-l)*(j-k)*(j-l)*(k-l)/12;
+}
 
+class FourVector;
 bool CheckMasses(const std::vector<achilles::FourVector>&, const std::vector<double>&, double=1e-8);
 
 const std::array<double, 3> ToCartesian(const std::array<double, 3>& vec);
