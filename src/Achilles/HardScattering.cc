@@ -266,9 +266,6 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
     std::vector<std::array<std::array<std::complex<double>,4>,4>> hadronTensor(hadronCurrent.size());
     std::array<std::array<std::complex<double>,4>,4> leptonTensor{};
 
-    spdlog::info("{}", hadronTensor[0][0][0]);
-    spdlog::info("{}", leptonTensor[0][0]);
-
     for(size_t mu = 0; mu < 4; ++mu) {
         for(size_t nu = 0; nu < 4; ++nu) {
             // loop for gauge boson
