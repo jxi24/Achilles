@@ -272,6 +272,7 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
                     auto boson2 = lcurrent2.first;
                     // loop for nucleon
                     // TODO: make sure the if condition is accurate
+                    hadronTensor[ {boson1, boson2}] .resize(hadronCurrent.size());
                     for(size_t k = 0; k < hadronCurrent.size(); ++k) {
                         if( (hadronCurrent[k].find(boson1) != hadronCurrent[k].end()) &&
                             (hadronCurrent[k].find(boson2) != hadronCurrent[k].end()) ) {
