@@ -256,30 +256,40 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
     // calc spin density matrix: amplitude (depends on k, i, j - nucleons and spins of all particles)
 
     // W and L calculations
-    std::vector<std::array<std::array<std::complex<double>,4>,4>> hadronTensor(hadronCurrent.size());
-    std::array<std::array<std::complex<double>,4>,4> leptonTensor{};
+    // std::vector<std::array<std::array<std::complex<double>,4>,4>> hadronTensor(hadronCurrent.size());
+    // std::array<std::array<std::complex<double>,4>,4> leptonTensor{};
+
+    // TODO: declare maps
+    std::map<std::pair<PID, PID>, std::vector<std::array<std::array<std::complex<double>,4>,4>>> hadronTensor;
+    std::map<std::pair<PID, PID>, std::array<std::array<std::complex<double>,4>,4>> leptonTensor;
 
     for(size_t mu = 0; mu < 4; ++mu) {
         for(size_t nu = 0; nu < 4; ++nu) {
-            // loop for gauge boson
-            for(const auto &lcurrent : leptonCurrent) {
-                auto boson = lcurrent.first; 
-                // loop for nucleon
-                for(size_t k = 0; k < hadronCurrent.size(); ++k) {
-                    // if this statement is not true, hadronTensor[k][mu][nu] is zero, does that make sense?
-                    if(hadronCurrent[k].find(boson) != hadronCurrent[k].end()) {
-                        // loop for spin - hadronic side
-                        for(size_t j = 0; j < nhad_spins; ++j) {
-                            // Calculate W^{\mu\nu}
-                            hadronTensor[k][mu][nu] += hadronCurrent[k][boson][j][mu] * std::conj(hadronCurrent[k][boson][j][nu]);
+            // loops for gauge bosons
+            for(const auto &lcurrent1 : leptonCurrent) {
+                auto boson1 = lcurrent1.first; 
+                for(const auto &lcurrent2 : leptonCurrent) {
+                    auto boson2 = lcurrent2.first;
+                    // loop for nucleon
+                    // TODO: make sure the if condition is accurate
+                    for(size_t k = 0; k < hadronCurrent.size(); ++k) {
+                        if( (hadronCurrent[k].find(boson1) != hadronCurrent[k].end()) &&
+                            (hadronCurrent[k].find(boson2) != hadronCurrent[k].end()) ) {
+                            // loop for spin - hadronic side
+                            for(size_t j = 0; j < nhad_spins; ++j) {
+                                // Calculate W^{\mu\nu}
+                                // TODO: make sure below is accurate
+                                hadronTensor[ {boson1, boson2} ][k][mu][nu] += hadronCurrent[k][boson1][j][mu] * std::conj(hadronCurrent[k][boson2][j][nu]);
+                            }
                         }
                     }
+                    // loop for spins - leptonic side
+                    for(size_t i = 0; i  < nlep_spins; ++i) {
+                        // Calculate L^{h}_{\mu\nu}
+                        leptonTensor[ {boson1, boson2} ][mu][nu] += lcurrent1.second[i][mu] * std::conj(lcurrent2.second[i][nu]); 
+                    }
                 }
-                // loop for spins - leptonic side
-                for(size_t i = 0; i  < nlep_spins; ++i) {
-                    // Calculate L^{h}_{\mu\nu}
-                    leptonTensor[mu][nu] += lcurrent.second[i][mu] * std::conj(lcurrent.second[i][nu]); 
-                }
+                
             }
 
         }    
@@ -287,9 +297,9 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
     
 
     // check hand calculation of tensors
-    spdlog::info("{}", leptonTensor[0][0]);
+    // spdlog::info("{}", leptonTensor[0][0]);
     double L_factor = (4 * M_PI) / (137 * pow((mom_in - mom_out), 2));
-    spdlog::info("{}", L_factor);
+    // spdlog::info("{}", L_factor);
 
     // compare to eqn 2
     // check to see if you got the right answer: contract hadronic tensor with leptonic tensor
@@ -306,9 +316,29 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
     // for taus, one is zero
 
     // 4 combos of spins
-    // L_h by summing the 2 +'s with a + and a 2 -'s with a -
+    // L_h by summing the 2 +'s with a + and the 2 -'s with a -
 
-    std::array<std::complex<double>, 2> contraction; 
+    // contraction calculations to check tensor calculations
+
+    std::array<std::complex<double>, 2> contraction;
+
+    for(const auto &ltensor : leptonTensor) {
+        auto bosons = ltensor.first;
+        for(size_t k = 0; k < hadronCurrent.size(); ++k) {
+            for(size_t mu = 0; mu < 4; ++mu) {
+                for(size_t nu = 0; nu < 4; ++nu) {
+                    double mult = 1;
+                    if ( ((mu == 0) && (nu != 0)) || ((mu != 0) && (nu == 0)) ) {
+                        mult = -1;
+                    }
+                    contraction[k] += mult * leptonTensor[bosons][mu][nu] * hadronTensor[bosons][k][mu][nu];
+                }
+            }
+
+        }
+    }
+
+    /*  
     // std::array<std::complex<double>, 2> contraction_amp;
     for(size_t k = 0; k < hadronCurrent.size(); ++k) {
         for(size_t mu = 0; mu < 4; ++mu) {
@@ -321,7 +351,7 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
             }
         }
         // contraction_amp[k] = std::abs(contraction[k]);
-    }
+    } */
 
     for(size_t k = 0; k < hadronCurrent.size(); ++k) {
         spdlog::info("{}", k);
