@@ -220,6 +220,19 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
     auto mass_in = lept_in.M();
     auto mass_out = lept_out.M();
 
+    // see if values are nan
+    /*spdlog::info("{}", lept_in);
+    spdlog::info("{}", lept_out);
+    spdlog::info("{}", energy_in);
+    spdlog::info("{}", energy_out);
+    spdlog::info("{}", mom_in);
+    spdlog::info("{}", mom_out);
+    spdlog::info("{}", direction_in);
+    spdlog::info("{}", direction_out);
+    spdlog::info("{}", mass_in); */
+    /* spdlog::info("{}", mass_out);
+    throw; */
+
     // calculate h_T
     auto ht_vec = direction_out.Cross(direction_out.Cross(direction_in));
     auto ht = FourVector(ht_vec, 0);
@@ -229,6 +242,11 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
     auto hl = FourVector(hl_vec, mom_out) / mass_out;
 
     auto hadronCurrent = m_nuclear -> CalcCurrents(event, ffInfo);
+
+    // check h
+    /* spdlog::info("{}", hl);
+    spdlog::info("{}", ht);
+    throw; */
 
     // amps2[k] calculations
     std::vector<double> amps2(hadronCurrent.size());
@@ -275,7 +293,12 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
                             // loop for spin - hadronic side
                             for(size_t j = 0; j < nhad_spins; ++j) {
                                 // Calculate W^{\mu\nu}
+                                /* std::complex<double> add = hadronCurrent[k][boson1][j][mu] * std::conj(hadronCurrent[k][boson2][j][nu]);
+                                spdlog::info(add);
+                                hadronTensor[ {boson1, boson2} ][k][mu][nu] += add; */
                                 hadronTensor[ {boson1, boson2} ][k][mu][nu] += hadronCurrent[k][boson1][j][mu] * std::conj(hadronCurrent[k][boson2][j][nu]);
+                                /* spdlog::info("{}", hadronCurrent[k][boson1][j][mu]);
+                                spdlog::info("{}", std::conj(hadronCurrent[k][boson2][j][nu])); */
                             }
                         }
                     }
@@ -287,7 +310,24 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
                 }   
             }
         }    
-    }    
+    } 
+    // throw;   
+
+    // checking to see if W and amps are 0
+    /* for(size_t mu = 0; mu < 4; ++mu) {
+        for(size_t nu = 0; nu < 4; ++nu) {
+            for (size_t k = 0; k < hadronCurrent.size(); ++k) {
+                spdlog::info("{}", hadronTensor[ {-24,-24} ][k][mu][nu]);
+            }
+        }
+    }
+
+    for (size_t k = 0; k < hadronCurrent.size(); ++k) {
+        spdlog::info("{}", amps2[k]);
+    }
+    throw; */
+        
+
 
     // compare to eqn 2
     // check to see if you got the right answer: contract hadronic tensor with leptonic tensor
@@ -378,29 +418,46 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
     }
 
     // calculate numerator
-    // segfault in this block of code in the array element definition
     std::vector<std::complex<double>> p_num(2);
     for(size_t mu = 0; mu < 4; ++mu) {
         for(size_t nu = 0; nu < 4; ++nu) {
             for(size_t k = 0; k < hadronCurrent.size(); ++k){
                 // calculate numerator for p_l
                 p_num[0] += mass_out * (hkkh[0][mu][nu] - gkh[0][mu][nu] + iehk[0][mu][nu]) * hadronTensor[{-24, -24}][k][mu][nu];
+                /* spdlog::info("{}", mass_out);
+                spdlog::info("{}", hkkh[0][mu][nu]);
+                spdlog::info("{}", gkh[0][mu][nu]);
+                spdlog::info("{}", iehk[0][mu][nu]);
+                spdlog::info("{}", hadronTensor[{-24, -24}][k][mu][nu]); */
                 // calculate numerator for p_k
                 p_num[1] += mass_out * (hkkh[1][mu][nu] - gkh[1][mu][nu] - iehk[1][mu][nu]) * hadronTensor[{-24, -24}][k][mu][nu];
-            }
+                /*spdlog::info("{}", mass_out);
+                spdlog::info("{}", hkkh[1][mu][nu]);
+                spdlog::info("{}", gkh[1][mu][nu]);
+                spdlog::info("{}", iehk[1][mu][nu]);
+                spdlog::info("{}", hadronTensor[{-24, -24}][k][mu][nu]);
+                throw;*/
+            }  
         }
     }
 
-    
     // calculate final polarization vector
-    std::vector<std::array<std::complex<double>,2>> p(hadronCurrent.size());
-    for(size_t k = 0; k < hadronCurrent.size(); ++k) {
-        // calculate p_l
-        // p[0][k] = p_num[0] / amps2[k];
-        // calculate p_k
-        p[1][k] = p_num[1] / amps2[k];
+    std::array<std::complex<double>,2> p;
+    for(size_t i = 0; i < 2; ++i) {
+        if (amps2[1] == 0) {
+            p[i] = 0;
+        }
+        else {
+            p[i] = p_num[i] / amps2[1];
+        }
     } 
-    
+
+    // print final polarization vector to check
+    spdlog::info("{}", "p[0]=");
+    spdlog::info("{}", p[0]);
+    spdlog::info("{}", "p[1]=");
+    spdlog::info("{}", p[1]);
+    throw;
 
     double spin_avg = 1;
     if(!ParticleInfo(m_leptonicProcess.m_ids[0]).IsNeutrino()) spin_avg *= 2;

@@ -89,6 +89,7 @@ bool SherpaMEs::Initialize(const std::vector<std::string> &args)
   addParameter(argv,"PRIORITY[2212]=99");
   // TODO: Make this something that is passed in
   addParameter(argv,"PRIORITY[1000060120]=99");
+  addParameter(argv,"MASSIVE[15]=1");
   // add additional commandline parameters
   for (const auto &arg: args) addParameter(argv,arg);
   // Initialise Sherpa and return.
