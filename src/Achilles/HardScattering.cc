@@ -221,7 +221,7 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
     auto mass_out = lept_out.M();
 
     // print + check basic properties
-    /*spdlog::info("{}", lept_in);
+    /* spdlog::info("{}", lept_in);
     spdlog::info("{}", lept_out);
     spdlog::info("{}", energy_in);
     spdlog::info("{}", energy_out);
@@ -229,8 +229,8 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
     spdlog::info("{}", mom_out);
     spdlog::info("{}", direction_in);
     spdlog::info("{}", direction_out);
-    spdlog::info("{}", mass_in); */
-    /* spdlog::info("{}", mass_out);
+    spdlog::info("{}", mass_in);
+    spdlog::info("{}", mass_out);
     throw; */
 
     // h_T calculation
@@ -361,9 +361,15 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
             }
             // print + check if contractions match amps2[k]
             /* spdlog::info("{}", k);
-            spdlog::info("{}", contraction[k]);
-            spdlog::info("{}", amps2[k]);*/
+            spdlog::info("{}", amps2[k]);
+            spdlog::info("{}", contraction[k]); */
         }
+    }
+
+    // print + check amps2[k]
+    if ( (amps2[1] != 0) && (amps2[1] == amps2[1]) ) {
+        spdlog::info("{}", "Denominator:");
+        spdlog::info("{}", amps2[1]);
     }
     //throw;
 
@@ -405,18 +411,28 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
 
     // calculate iehk
     std::vector<std::array<std::array<std::complex<double>,4>,4>> iehk(2);
+    std::complex<double> i = (0, 1);
     for(size_t mu = 0; mu < 4; ++mu) {
         for(size_t nu = 0; nu < 4; ++nu) {
             for(size_t alpha = 0; alpha < 4; ++alpha) {
                 for(size_t beta = 0; beta < 4; ++beta) {
                     // calculate ieh_l * k
-                    iehk[0][mu][nu] += std::complex<double>(0.0, 1.0) * (std::complex<double>)(LeviCivita(mu, nu, alpha, beta)) * hl[alpha] * lept_in[beta];
+                    iehk[0][mu][nu] += i * (std::complex<double>)(LeviCivita(mu, nu, alpha, beta)) * hl[alpha] * lept_in[beta];
+                    // print + check iehk components
+                    /* if ( (amps2[1] != 0) && (amps2[1] == amps2[1]) ) {
+                        spdlog::info("{}", (std::complex<double>)(LeviCivita(mu, nu, alpha, beta)));
+                        spdlog::info("{}", hl[alpha]);
+                        spdlog::info("{}", ht[alpha]);
+                        spdlog::info("{}", lept_in[beta]);
+                        spdlog::info("{}", amps2[1]);
+                    } */
                     // calculate ieh_t * k
-                    iehk[1][mu][nu] += std::complex<double>(0.0, 1.0) * (std::complex<double>)(LeviCivita(mu, nu, alpha, beta)) * ht[alpha] * lept_in[beta];
+                    iehk[1][mu][nu] += i * (std::complex<double>)(LeviCivita(mu, nu, alpha, beta)) * ht[alpha] * lept_in[beta];
                 }
             }
         }
     }
+    // throw;
 
     // calculate numerator
     std::vector<std::complex<double>> p_num(2);
@@ -444,24 +460,48 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
             } */
             p_num[0] += mass_out * (hkkh[0][mu][nu] - gkh[0][mu][nu] + iehk[0][mu][nu]) * hadronTensor[{-24, -24}][1][mu][nu];
             p_num[1] += mass_out * (hkkh[1][mu][nu] - gkh[1][mu][nu] - iehk[1][mu][nu]) * hadronTensor[{-24, -24}][1][mu][nu];
+            // print + check equation components
+            if ( (amps2[1] != 0) && (amps2[1] == amps2[1]) ) {
+                spdlog::info("{}", "Numerator Terms:");
+                spdlog::info("{}", mass_out);
+                spdlog::info("{}", hkkh[0][mu][nu]);
+                spdlog::info("{}", gkh[0][mu][nu]);
+                spdlog::info("{}", iehk[0][mu][nu]);
+                spdlog::info("{}", hadronTensor[{-24, -24}][1][mu][nu]);
+                spdlog::info("{}", hkkh[1][mu][nu]);
+                spdlog::info("{}", gkh[1][mu][nu]);
+                spdlog::info("{}", iehk[1][mu][nu]); 
+            }
+            // print + check W
+            /* if ( (amps2[1] != 0) && (amps2[1] == amps2[1]) ) {
+                spdlog::info("{}", hadronTensor[{-24, -24}][1][mu][nu]);
+            } */
         }
+    }
+
+    // print + check num
+    if ( (amps2[1] != 0) && (amps2[1] == amps2[1]) ) {
+        spdlog::info("{}", "Numerators:");
+        spdlog::info("{}", p_num[0]);
+        spdlog::info("{}", p_num[1]);
     }
 
     // calculate, print + check final polarization vector
     std::array<std::complex<double>,2> p;
+    spdlog::info("{}", "Results:");
     for(size_t i = 0; i < 2; ++i) {
-        if (amps2[1] == 0) {
+        if ( (amps2[1] != 0) && (amps2[1] == amps2[1]) ) {
+            p[i] = p_num[i] / amps2[1];
+            spdlog::info("{}", p[i]);
+        }
+        else if (amps2[1] == 0) {
             p[i] = 0;
             spdlog::info("{}", p[i]);
         }
-        else if (amps2[i] != amps2[i]) {
+        else {
             p[i] = 0;
             spdlog::info("{}", "amps2[k] is nan");
             spdlog::info("{}", "polarization was not calculated");
-        }
-        else {
-            p[i] = p_num[i] / amps2[1];
-            spdlog::info("{}", p[i]);
         }
     } 
     throw;
