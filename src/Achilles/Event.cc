@@ -124,3 +124,11 @@ void Event::Rotate(const std::array<double,9>& rot_mat) {
     for (auto& particle: m_nuc -> Nucleons()){ particle.Rotate(rot_mat); }
     for (auto& particle: m_leptons){ particle.Rotate(rot_mat); }
 }
+
+std::complex<double> Event::get_polarization_l() {
+    return m_polarization_l;
+}
+
+std::complex<double> Event::get_polarization_t() {
+    return m_polarization_t;
+}

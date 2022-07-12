@@ -438,11 +438,12 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
     std::vector<std::complex<double>> p_num(2);
     for(size_t mu = 0; mu < 4; ++mu) {
         for(size_t nu = 0; nu < 4; ++nu) {
-            // no longer needed because we only need to consider k = 1
+            // old version no longer needed because we only need to consider k = 1
             /* for(size_t k = 0; k < hadronCurrent.size(); ++k){
                 // calculate numerator for p_l
                 p_num[0] += mass_out * (hkkh[0][mu][nu] - gkh[0][mu][nu] + iehk[0][mu][nu]) * hadronTensor[{-24, -24}][k][mu][nu];
                 // print + check equation components
+                spdlog::info("{}", "Numerator Terms:");
                 spdlog::info("{}", mass_out);
                 spdlog::info("{}", hkkh[0][mu][nu]);
                 spdlog::info("{}", gkh[0][mu][nu]);
@@ -456,8 +457,8 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
                 spdlog::info("{}", gkh[1][mu][nu]);
                 spdlog::info("{}", iehk[1][mu][nu]);
                 spdlog::info("{}", hadronTensor[{-24, -24}][k][mu][nu]);
-                throw;
-            } */
+            }  */
+            // new version
             p_num[0] += mass_out * (hkkh[0][mu][nu] - gkh[0][mu][nu] + iehk[0][mu][nu]) * hadronTensor[{-24, -24}][1][mu][nu];
             p_num[1] += mass_out * (hkkh[1][mu][nu] - gkh[1][mu][nu] - iehk[1][mu][nu]) * hadronTensor[{-24, -24}][1][mu][nu];
             // print + check equation components
