@@ -73,10 +73,14 @@ class Event {
                 && m_leptons == other.m_leptons;
         }
 
-        double get_polarization_l();
-        double get_polarization_t();
-        void set_polarization_l(double new_polarization);
-        void set_polarization_t(double new_polarization);
+        // accessor, returns an array of polarization_l for k = 0 and k = 1
+        std::array<double, 2> get_polarization_l();
+        // accessor, returns an array of polarization_t for k = 0 and k = 1
+        std::array<double, 2> get_polarization_t();
+        // mutator, modifies an array of polarization_l for k = 0 and k = 1
+        void set_polarization_l(std::array<double, 2> new_polarization);
+        // mutator, modifies an array of polarization_l for k = 0 and k = 1
+        void set_polarization_t(std::array<double, 2> new_polarization);
 
     private:
         std::vector<double> EventProbs() const;
@@ -91,8 +95,9 @@ class Event {
         double m_vWgt{}, m_meWgt{};
         vParticles m_leptons{};
         vParticles m_history{};
-        double m_polarization_l{};
-        double m_polarization_t{};
+        // arrays keeping track of p_l and p_t for k = 0 and k = 1
+        std::array<double, 2> m_polarization_l{};
+        std::array<double, 2> m_polarization_t{};
 };
 
 }

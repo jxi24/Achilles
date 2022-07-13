@@ -54,9 +54,11 @@ class EventGen {
         YAML::Node config;
 
         std::shared_ptr<EventWriter> writer;
-        
-        StatsData Polarization_l;
-        StatsData Polarization_t;
+
+        // arrays keeping track of p_L StatsData objects for k = 0 and k = 1
+        std::array<StatsData, 2> Polarization_l;
+        // arrays keeping track of p_T StatsData objects for k = 0 and k = 1
+        std::array<StatsData, 2> Polarization_t;
 };
 
 }
