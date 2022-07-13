@@ -231,12 +231,101 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
                 }
                 sign = -1.0;
             }
-            for(size_t k = 0; k < hadronCurrent.size(); ++k)
+            for(size_t k = 0; k < hadronCurrent.size(); ++k) {
                 amps2[k] += std::norm(amps[k]);
+            }
+        }
+    }
+
+    auto lept_in = event.Momentum()[1];
+    auto lept_out = event.Momentum().back();
+    auto energy_in = lept_in.E();
+    auto mass_out = lept_out.M();
+    // auto mom_in = lept_in.Vec3().Magnitude();
+    auto direction_in = lept_in.Vec3().Unit();
+    auto direction_out = lept_out.Vec3().Unit();
+
+    auto hL = 1/ mass_out * FourVector(energy_in * direction_out, lept_out.Vec3().Magnitude());
+    auto hT = FourVector(direction_out.Cross(direction_out.Cross(direction_in)), 0);
+
+    std::map<std::pair<PID, PID>, std::vector<std::array<std::array<std::complex<double>,4>,4>>> hadronTensor;
+    std::map<std::pair<PID, PID>, std::array<std::array<std::complex<double>,4>,4>> leptonTensor;
+    for(size_t mu = 0; mu < 4; ++mu) {
+        for(size_t nu = 0; nu < 4; ++nu) {
+            for(const auto &lcurrent1 : leptonCurrent) {
+                auto boson1 = lcurrent1.first;
+                for(const auto &lcurrent2 : leptonCurrent) {
+                    auto boson2 = lcurrent2.first;
+                    hadronTensor[{boson1, boson2}].resize(hadronCurrent.size());
+                    for(size_t k = 0; k < hadronCurrent.size(); ++k) {
+                        for(size_t j = 0; j < nhad_spins; ++j) {
+                            // Calculate W^{\mu\nu}
+                            hadronTensor[{boson1,boson2}][k][mu][nu] += hadronCurrent[k][boson1][j][mu] * std::conj(hadronCurrent[k][boson2][j][nu]);
+                        }
+                    }
+                    for(size_t i = 0; i  < nlep_spins; ++i) {
+                        // calculate L^{\mu\nu}
+                        leptonTensor[{boson1,boson2}][mu][nu] += (lcurrent1.second[i][mu] * std::conj(lcurrent2.second[i][nu]));
+                        //spdlog::info(leptonTensor[{boson1,boson2}][mu][nu]);
+                        //spdlog::info(hadronTensor[{boson1,boson2}][0][mu][nu]);
+                        //throw;
+                    }  
+                } 
+            }
+        }
+    }  
+
+
+    std::complex<double> pL;
+    std::complex<double> pT;
+    std::array<std::complex<double>, 2> wl{};
+
+    for(const auto &ltensor : leptonTensor) {
+        auto bosons = ltensor.first;
+        for(size_t k = 0; k < hadronCurrent.size(); ++k) {
+            for(size_t mu = 0; mu < 4; ++mu) {
+                for(size_t nu = 0; nu < 4; ++nu) {
+                    double sign = 1;
+                    if ( ((mu == 0) && (nu != 0)) || ((mu != 0) && (nu == 0)) ) {
+                        sign = -1;
+                    }
+                    wl[k] += (leptonTensor[bosons][mu][nu] * sign) * hadronTensor[bosons][k][mu][nu];
+                }
+            }
         }
     }
 
     // Contract W^{\mu\nu} with L_{\mu\nu} => Numerator of P_(L,T)
+    double sign = 1;
+    for(size_t mu = 0; mu < 4; ++mu) {
+        for(size_t nu = 0; nu < 4; ++nu) {
+            for(size_t alpha = 0; alpha < 4; ++alpha) {
+                for(size_t beta = 0; beta < 4; ++beta) {
+                    std::complex<double> i = {0,1};
+                    if (amps2[1] == 0) {
+                        pL = 0;
+                        pT = 0;
+                    }
+                    else {
+                        pL += ((mass_out)*(hL[mu]*lept_in[nu] + lept_in[mu]*hL[nu] - sign*lept_in*hL 
+                        - LeviCivita(mu,nu,alpha,beta)*hL[alpha]*lept_in[beta]*i)*hadronTensor[{-24,-24}][1][mu][nu])/(real(wl[1]));
+                        pT += ((mass_out)*(hT[mu]*lept_in[nu] + lept_in[mu]*hL[nu] - sign*lept_in*hT 
+                        + LeviCivita(mu,nu,alpha,beta)*hT[alpha]*lept_in[beta]*i)*hadronTensor[{-24,-24}][1][mu][nu])/(real(wl[1]));
+                    }   
+                }
+            }                   
+        }
+    }
+
+    spdlog::info("wl and amps2");
+    spdlog::info(real(wl[1]));
+    spdlog::info(amps2[1]);
+    spdlog::info("end");
+    spdlog::info(pL);
+    spdlog::info(pT);
+    spdlog::info(pL+pT);
+
+
 
     double spin_avg = 1;
     if(!ParticleInfo(m_leptonicProcess.m_ids[0]).IsNeutrino()) spin_avg *= 2;
