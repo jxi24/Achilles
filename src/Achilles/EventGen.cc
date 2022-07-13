@@ -278,10 +278,23 @@ void achilles::EventGen::GenerateEvents() {
     fmt::print("Integral = {:^8.5e} +/- {:^8.5e} ({:^8.5e} %)\n",
                result.results.back().Mean(), result.results.back().Error(),
                result.results.back().Error() / result.results.back().Mean()*100);
-    fmt::print("Polarization_L (k = 0) = {;^8.5e} +/- {:^8.5e}\n", Polarization_l[0].Mean(), Polarization_l[0].Error());
-    fmt::print("Polarization T (k = 0) = {;^8.5e} +/- {:^8.5e}\n", Polarization_t[0].Mean(), Polarization_t[0].Error());
-    fmt::print("Polarization_L (k = 1) = {;^8.5e} +/- {:^8.5e}\n", Polarization_l[1].Mean(), Polarization_l[1].Error());
-    fmt::print("Polarization_T (k = 1) = {;^8.5e} +/- {:^8.5e}\n", Polarization_t[1].Mean(), Polarization_t[1].Error());
+    // access run.yml
+    YAML::Node run = YAML::LoadFile("/Users/sherry/Desktop/Fermilab/Achilles/build/run.yml");
+    // 1. use pids
+    // 2. if PID = 18, anti tau neutrino --> k = 0
+    // if PID = 16, tau neutrino --> k = 1
+    // print one k value only 
+    // 3. use line from HardScattering
+    // TODO: replace with variable
+    bool anti = ((scattering -> Process().m_ids)[0].AsInt() < 0);
+    if (anti) {
+        fmt::print("Polarization_L (k = 0) = {;^8.5e} +/- {:^8.5e}\n", Polarization_l[0].Mean(), Polarization_l[0].Error());
+        fmt::print("Polarization T (k = 0) = {;^8.5e} +/- {:^8.5e}\n", Polarization_t[0].Mean(), Polarization_t[0].Error());
+    }
+    else {
+        fmt::print("Polarization_L (k = 1) = {;^8.5e} +/- {:^8.5e}\n", Polarization_l[1].Mean(), Polarization_l[1].Error());
+        fmt::print("Polarization_T (k = 1) = {;^8.5e} +/- {:^8.5e}\n", Polarization_t[1].Mean(), Polarization_t[1].Error());
+    }
 }
 
 double achilles::EventGen::GenerateEvent(const std::vector<FourVector> &mom, const double &wgt) {
