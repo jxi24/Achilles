@@ -278,6 +278,8 @@ void achilles::EventGen::GenerateEvents() {
     fmt::print("Integral = {:^8.5e} +/- {:^8.5e} ({:^8.5e} %)\n",
                result.results.back().Mean(), result.results.back().Error(),
                result.results.back().Error() / result.results.back().Mean()*100);
+    fmt::print("Polarization L = {;^8.5e} +/- {:^8.5e}\n", Polarization_l.Mean(), Polarization_l.Error());
+    fmt::print("Polarization T = {;^8.5e} +/- {:^8.5e}\n", Polarization_t.Mean(), Polarization_t.Error());
 }
 
 double achilles::EventGen::GenerateEvent(const std::vector<FourVector> &mom, const double &wgt) {
@@ -381,6 +383,8 @@ double achilles::EventGen::GenerateEvent(const std::vector<FourVector> &mom, con
             // Keep a running total of the number of surviving events
             event.Finalize();
             writer -> Write(event);
+            Polarization_l += event.get_polarization_l();
+            Polarization_t += event.get_polarization_t();
         }
     }
 

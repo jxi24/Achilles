@@ -73,8 +73,10 @@ class Event {
                 && m_leptons == other.m_leptons;
         }
 
-        std::complex<double> get_polarization_l();
-        std::complex<double> get_polarization_t();
+        double get_polarization_l();
+        double get_polarization_t();
+        void set_polarization_l(double new_polarization);
+        void set_polarization_t(double new_polarization);
 
     private:
         std::vector<double> EventProbs() const;
@@ -89,8 +91,8 @@ class Event {
         double m_vWgt{}, m_meWgt{};
         vParticles m_leptons{};
         vParticles m_history{};
-        std::complex<double> m_polarization_l{};
-        std::complex<double> m_polarization_t{};
+        double m_polarization_l{};
+        double m_polarization_t{};
 };
 
 }

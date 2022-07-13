@@ -516,6 +516,10 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
     spdlog::info("{}", p[1]);
     throw; */
 
+    // connect final polarization vector to event code
+    event.set_polarization_l(p[0].real());
+    event.set_polarization_t(p[1].real());
+
     double spin_avg = 1;
     if(!ParticleInfo(m_leptonicProcess.m_ids[0]).IsNeutrino()) spin_avg *= 2;
     if(m_nuclear -> NSpins() > 1) spin_avg *= 2;
