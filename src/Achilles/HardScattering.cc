@@ -443,12 +443,12 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
                 // calculate numerator for p_l
                 p_num[0] += mass_out * (hkkh[0][mu][nu] - gkh[0][mu][nu] + iehk[0][mu][nu]) * hadronTensor[{-24, -24}][k][mu][nu];
                 // print + check equation components
-                spdlog::info("{}", "Numerator Terms:");
+                /* spdlog::info("{}", "Numerator Terms:");
                 spdlog::info("{}", mass_out);
                 spdlog::info("{}", hkkh[0][mu][nu]);
                 spdlog::info("{}", gkh[0][mu][nu]);
                 spdlog::info("{}", iehk[0][mu][nu]);
-                spdlog::info("{}", hadronTensor[{-24, -24}][k][mu][nu]);
+                spdlog::info("{}", hadronTensor[{-24, -24}][k][mu][nu]); */
                 // calculate numerator for p_k
                 p_num[1] += mass_out * (hkkh[1][mu][nu] - gkh[1][mu][nu] - iehk[1][mu][nu]) * hadronTensor[{-24, -24}][k][mu][nu];
                 // print + check equation components
@@ -489,7 +489,7 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
 
     // calculate, print + check final polarization vector
     std::vector<std::array<std::complex<double>,2>> p(hadronCurrent.size());
-    spdlog::info("{}", "Results:");
+    // spdlog::info("{}", "Results:");
     // loop over polarization
     for(size_t i = 0; i < 2; ++i) {
         for(size_t k = 0; k < hadronCurrent.size(); ++k) {
@@ -504,11 +504,14 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
             else {
                 p[i][k] = 0;
                 spdlog::info("{}", "amps2[k] is nan");
-                spdlog::info("{}", "polarization at (", i, ",", k, ") was not calculated");
+                spdlog::info("{}", "polarization was not calculated");
+                spdlog::info("{}", i);
+                spdlog::info("{}", k);
+                throw;
             }
-        } 
-        
+        }  
     } 
+    throw;
 
     /* // print + check final polarization vector
     // p_l
@@ -522,7 +525,6 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
     // connect final polarization vector to event code
     event.set_polarization_l({p[0][0].real(), p[0][1].real()});
     event.set_polarization_t({p[1][0].real(), p[1][1].real()});
-    throw;
 
     double spin_avg = 1;
     if(!ParticleInfo(m_leptonicProcess.m_ids[0]).IsNeutrino()) spin_avg *= 2;
