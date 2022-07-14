@@ -22,6 +22,10 @@
 #include "Achilles/PhaseSpaceMapper.hh"
 #include "Achilles/QuasielasticTestMapper.hh"
 
+#include <iostream>
+#include <string>
+#include <fstream>
+
 #ifdef ENABLE_BSM
 #include "plugins/Sherpa/Channels1.hh"
 #include "plugins/Sherpa/Channels3.hh"
@@ -279,7 +283,7 @@ void achilles::EventGen::GenerateEvents() {
                result.results.back().Mean(), result.results.back().Error(),
                result.results.back().Error() / result.results.back().Mean()*100);
     // access run.yml
-    YAML::Node run = YAML::LoadFile("/Users/sherry/Desktop/Fermilab/Achilles/build/run.yml");
+    // YAML::Node run = YAML::LoadFile("/Users/sherry/Desktop/Fermilab/Achilles/build/run.yml");
     // 1. use pids
     // 2. if PID = 18, anti tau neutrino --> k = 0
     // if PID = 16, tau neutrino --> k = 1
@@ -287,13 +291,54 @@ void achilles::EventGen::GenerateEvents() {
     // 3. use line from HardScattering
     // TODO: replace with variable
     bool anti = ((scattering -> Process().m_ids)[0].AsInt() < 0);
+    // if anti tau neutrino
     if (anti) {
+        // print results
         fmt::print("Polarization_L (k = 0) = {;^8.5e} +/- {:^8.5e}\n", Polarization_l[0].Mean(), Polarization_l[0].Error());
         fmt::print("Polarization T (k = 0) = {;^8.5e} +/- {:^8.5e}\n", Polarization_t[0].Mean(), Polarization_t[0].Error());
+        // export results to file
+        try {
+            std::cout << "Writing data to file" << "\n";
+            std::ofstream anti_tau_data("/Users/sherry/Desktop/Fermilab/Achilles/build/anti_tau_data.txt", std::ofstream::out);
+            if (anti_tau_data.is_open()) {
+                anti_tau_data << Polarization_l[0].Mean() << "\t" <<  Polarization_t[0].Mean() << "\t" << Polarization_l[0].Error() << "\t" 
+                << Polarization_t[0].Error() << "\n";
+            }
+            else {
+                std::cout << "There was a problem opening the file" << "\n";
+            }
+        }
+        catch (const char* msg) {
+            std::cerr << msg << "\n";
+        }
+        std::cout << "Done!\n";
+        std::cout << "Press any key to exit...\n";
+        getchar();
     }
+    // if tau neutrino
     else {
+        // print results
         fmt::print("Polarization_L (k = 1) = {;^8.5e} +/- {:^8.5e}\n", Polarization_l[1].Mean(), Polarization_l[1].Error());
         fmt::print("Polarization_T (k = 1) = {;^8.5e} +/- {:^8.5e}\n", Polarization_t[1].Mean(), Polarization_t[1].Error());
+
+        // export results to file
+        try {
+            std::cout << "Writing data to file" << "\n";
+            std::ofstream tau_data("/Users/sherry/Desktop/Fermilab/Achilles/build/tau_data.txt", std::ofstream::out);
+            if (tau_data.is_open()) {
+                tau_data << Polarization_l[1].Mean() << "\t" <<  Polarization_t[1].Mean() << "\t" << Polarization_l[1].Error() << "\t" 
+                << Polarization_t[1].Error() << "\n";
+            }
+            else {
+                std::cout << "There was a problem opening the file" << "\n";
+            }
+        }
+        catch (const char* msg) {
+            std::cerr << msg << "\n";
+        }
+        std::cout << "Done!\n";
+        std::cout << "Press any key to exit...\n";
+        getchar();
     }
 }
 
