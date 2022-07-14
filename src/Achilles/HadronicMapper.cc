@@ -19,9 +19,12 @@ double CoherentMapper::GenerateWeight(const std::vector<FourVector> &, std::vect
 
 void QESpectralMapper::GeneratePoint(std::vector<FourVector> &point, const std::vector<double> &rans) {
     // Generate inital nucleon state
-    double dp = point[1].E() + sqrt(pow(point[1].E(), 2) + 2*point[1].E()*Constant::mN + Constant::mN2 - Smin());
-    dp = dp > 800 ? 800 : dp;
-    const double mom = dp*rans[0];
+    double pmin = point[1].E() - sqrt(pow(point[1].E(), 2) + 2*point[1].E()*Constant::mN + Constant::mN2 - Smin());
+    double pmax = point[1].E() + sqrt(pow(point[1].E(), 2) + 2*point[1].E()*Constant::mN + Constant::mN2 - Smin());
+    pmin = pmin < 0 ? 0 : pmin;
+    pmax = pmax > 800 ? 800 : pmax;
+    double dp = pmax - pmin;
+    const double mom = dp*rans[0] + pmin;
     double cosT_max = (2*point[1].E()*Constant::mN+Constant::mN2-mom*mom-Smin())/(2*point[1].E()*mom);
     cosT_max = cosT_max > 1 ? 1 : cosT_max;
     const double cosT = (cosT_max + 1)*rans[1] - 1;
@@ -43,6 +46,9 @@ void QESpectralMapper::GeneratePoint(std::vector<FourVector> &point, const std::
 
     point[HadronIdx()] = {Constant::mN - energy, mom*sinT*cos(phi), mom*sinT*sin(phi), mom*cosT};
     Mapper<FourVector>::Print(__PRETTY_FUNCTION__, point, rans);
+    spdlog::trace("  dp = {}", dp);
+    spdlog::trace("  cosT_min = {}", cosT_max);
+    spdlog::trace("  cosT_max = {}", cosT_max);
     spdlog::trace("  cosT = {}", cosT);
     spdlog::trace("  mom = {}", mom);
     spdlog::trace("  energy = {}", energy);
@@ -51,9 +57,12 @@ void QESpectralMapper::GeneratePoint(std::vector<FourVector> &point, const std::
 }
 
 double QESpectralMapper::GenerateWeight(const std::vector<FourVector> &point, std::vector<double> &rans) {
-    double dp = point[1].E() + sqrt(pow(point[1].E(), 2) + 2*point[1].E()*Constant::mN + Constant::mN2 - Smin());
-    dp = dp > 800 ? 800 : dp;
-    rans[0] = point[HadronIdx()].P()/dp;
+    double pmin = point[1].E() - sqrt(pow(point[1].E(), 2) + 2*point[1].E()*Constant::mN + Constant::mN2 - Smin());
+    double pmax = point[1].E() + sqrt(pow(point[1].E(), 2) + 2*point[1].E()*Constant::mN + Constant::mN2 - Smin());
+    pmin = pmin < 0 ? 0 : pmin;
+    pmax = pmax > 800 ? 800 : pmax;
+    double dp = pmax - pmin;
+    rans[0] = (point[HadronIdx()].P() - pmin)/dp;
     double cosT_max = (2*point[1].E()*Constant::mN+Constant::mN2-point[0].P2()-Smin())/(2*point[1].E()*point[0].P());
     cosT_max = cosT_max > 1 ? 1 : cosT_max;
     double dCos = (cosT_max + 1);
