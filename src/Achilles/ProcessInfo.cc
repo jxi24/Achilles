@@ -9,11 +9,13 @@ std::vector<double> achilles::Process_Info::Masses() const {
 
     // Get Hadronic current masses
     for(size_t i = 0; i < m_states.begin() -> second.size(); ++i) {
+        spdlog::trace("Mass[{}] = {}", m_states.begin() -> second[i], ParticleInfo(m_states.begin() -> second[i]).Mass());
         masses.push_back(pow(ParticleInfo(m_states.begin() -> second[i]).Mass(), 2));
     }
 
     // Get Leptonic current masses
     for(size_t i = 1; i < m_ids.size(); ++i) {
+        spdlog::trace("Mass[{}, {}] = {}", m_ids[i], ParticleInfo(m_ids[i]).Name(), ParticleInfo(m_ids[i]).Mass());
         masses.push_back(pow(ParticleInfo(m_ids[i]).Mass(), 2));
     }
 
