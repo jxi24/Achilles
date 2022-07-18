@@ -312,10 +312,12 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
     // throw;   
 
     // print + check to see if W and amps are 0
-    /* for(size_t mu = 0; mu < 4; ++mu) {
+    /*for(size_t mu = 0; mu < 4; ++mu) {
         for(size_t nu = 0; nu < 4; ++nu) {
             for (size_t k = 0; k < hadronCurrent.size(); ++k) {
-                spdlog::info("{}", hadronTensor[ {-24,-24} ][k][mu][nu]);
+                if ( (amps2[k] != 0) && (amps2[k] == amps2[k]) ) {
+                    spdlog::info("{}", hadronTensor[ {24,24} ][k][mu][nu]);
+                }
             }
         }
     }
@@ -323,7 +325,7 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
     for (size_t k = 0; k < hadronCurrent.size(); ++k) {
         spdlog::info("{}", amps2[k]);
     }
-    throw; */
+    throw;*/
         
 
     // compare to eqn 2
@@ -440,33 +442,54 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
     for(size_t mu = 0; mu < 4; ++mu) {
         for(size_t nu = 0; nu < 4; ++nu) {
             for(size_t k = 0; k < hadronCurrent.size(); ++k) {
-                // newest version
-                p_num[0][k] += mass_out * (hkkh[0][mu][nu] - gkh[0][mu][nu] + iehk[0][mu][nu]) * hadronTensor[{-24, -24}][k][mu][nu];
-                p_num[1][k] += mass_out * (hkkh[1][mu][nu] - gkh[1][mu][nu] - iehk[1][mu][nu]) * hadronTensor[{-24, -24}][k][mu][nu];
+                // newest version - SEGFAULT BEING CAUSED HERE BY ACCESSING HADRON TENSOR
+                // print + check values
+                /* spdlog::info("{}", mass_out);
+                spdlog::info("{}", hkkh[0][mu][nu]);
+                spdlog::info("{}", gkh[0][mu][nu]);
+                spdlog::info("{}", iehk[0][mu][nu]);
+                spdlog::info("{}", hadronTensor[{24, 24}][k][mu][nu]);
+                spdlog::info("{}", mass_out);
+                spdlog::info("{}", hkkh[1][mu][nu]);
+                spdlog::info("{}", gkh[1][mu][nu]);
+                spdlog::info("{}", iehk[1][mu][nu]);
+                spdlog::info("{}", hadronTensor[{24, 24}][k][mu][nu]); */
+                /* if ( (amps2[k] != 0) && (amps2[k] == amps2[k]) ) {
+                    p_num[0][k] += mass_out * (hkkh[0][mu][nu] - gkh[0][mu][nu] + iehk[0][mu][nu]) * hadronTensor[{24, 24}][k][mu][nu];
+                    spdlog::info("{}", 461);
+                    p_num[1][k] += mass_out * (hkkh[1][mu][nu] - gkh[1][mu][nu] - iehk[1][mu][nu]) * hadronTensor[{24, 24}][k][mu][nu];
+                    spdlog::info("{}", 463);
+                }
+                else {
+                    p_num[0][k] = 0;
+                    spdlog::info("{}", 467);
+                    p_num[1][k] = 0;
+                    spdlog::info("{}", 469); }*/
+                
             }
             // old version no longer needed because we only need to consider k = 1
             /* for(size_t k = 0; k < hadronCurrent.size(); ++k){
                 // calculate numerator for p_l
-                p_num[0] += mass_out * (hkkh[0][mu][nu] - gkh[0][mu][nu] + iehk[0][mu][nu]) * hadronTensor[{-24, -24}][k][mu][nu];
+                p_num[0] += mass_out * (hkkh[0][mu][nu] - gkh[0][mu][nu] + iehk[0][mu][nu]) * hadronTensor[{24, 24}][k][mu][nu];
                 // print + check equation components
                 /* spdlog::info("{}", "Numerator Terms:");
                 spdlog::info("{}", mass_out);
                 spdlog::info("{}", hkkh[0][mu][nu]);
                 spdlog::info("{}", gkh[0][mu][nu]);
                 spdlog::info("{}", iehk[0][mu][nu]);
-                spdlog::info("{}", hadronTensor[{-24, -24}][k][mu][nu]);
+                spdlog::info("{}", hadronTensor[{24, 24}][k][mu][nu]);
                 // calculate numerator for p_k
-                p_num[1] += mass_out * (hkkh[1][mu][nu] - gkh[1][mu][nu] - iehk[1][mu][nu]) * hadronTensor[{-24, -24}][k][mu][nu];
+                p_num[1] += mass_out * (hkkh[1][mu][nu] - gkh[1][mu][nu] - iehk[1][mu][nu]) * hadronTensor[{24, 24}][k][mu][nu];
                 // print + check equation components
                 spdlog::info("{}", mass_out);
                 spdlog::info("{}", hkkh[1][mu][nu]);
                 spdlog::info("{}", gkh[1][mu][nu]);
                 spdlog::info("{}", iehk[1][mu][nu]);
-                spdlog::info("{}", hadronTensor[{-24, -24}][k][mu][nu]);
+                spdlog::info("{}", hadronTensor[{24, 24}][k][mu][nu]);
             }  */
             // old version replaced because need to consider k = 0
-            /* p_num[0] += mass_out * (hkkh[0][mu][nu] - gkh[0][mu][nu] + iehk[0][mu][nu]) * hadronTensor[{-24, -24}][1][mu][nu];
-            p_num[1] += mass_out * (hkkh[1][mu][nu] - gkh[1][mu][nu] - iehk[1][mu][nu]) * hadronTensor[{-24, -24}][1][mu][nu];
+            /* p_num[0] += mass_out * (hkkh[0][mu][nu] - gkh[0][mu][nu] + iehk[0][mu][nu]) * hadronTensor[{24, 24}][1][mu][nu];
+            p_num[1] += mass_out * (hkkh[1][mu][nu] - gkh[1][mu][nu] - iehk[1][mu][nu]) * hadronTensor[{24, 24}][1][mu][nu];
             // print + check equation components
             if ( (amps2[1] != 0) && (amps2[1] == amps2[1]) ) {
                 spdlog::info("{}", "Numerator Terms:");
@@ -474,14 +497,14 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
                 spdlog::info("{}", hkkh[0][mu][nu]);
                 spdlog::info("{}", gkh[0][mu][nu]);
                 spdlog::info("{}", iehk[0][mu][nu]);
-                spdlog::info("{}", hadronTensor[{-24, -24}][1][mu][nu]);
+                spdlog::info("{}", hadronTensor[{24, 24}][1][mu][nu]);
                 spdlog::info("{}", hkkh[1][mu][nu]);
                 spdlog::info("{}", gkh[1][mu][nu]);
                 spdlog::info("{}", iehk[1][mu][nu]); 
             } */
             // print + check W
             /* if ( (amps2[1] != 0) && (amps2[1] == amps2[1]) ) {
-                spdlog::info("{}", hadronTensor[{-24, -24}][1][mu][nu]);
+                spdlog::info("{}", hadronTensor[{24, 24}][1][mu][nu]);
             } */
         }
     }
@@ -501,32 +524,30 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
         for(size_t k = 0; k < hadronCurrent.size(); ++k) {
             if ( (amps2[k] != 0) && (amps2[k] == amps2[k]) ) {
                 p[i][k] = p_num[i][k] / amps2[k];
-                spdlog::info("{}", p[i][k]);
             }
             else if (amps2[k] == 0) {
                 p[i][k] = 0;
-                spdlog::info("{}", p[i][k]);
             }
             else {
                 p[i][k] = 0;
                 spdlog::info("{}", "amps2[k] is nan");
-                spdlog::info("{}", "polarization was not calculated");
-                spdlog::info("{}", i);
-                spdlog::info("{}", k);
                 throw;
             }
         }  
     } 
-    throw;
 
-    /* // print + check final polarization vector
+    // print + check final polarization vector
     // p_l
-    spdlog::info("{}", "p[0]=");
-    spdlog::info("{}", p[0]);
+    spdlog::info("{}", "p[0][0]=");
+    spdlog::info("{}", p[0][0]);
+    spdlog::info("{}", "p[0][1]=");
+    spdlog::info("{}", p[0][1]);
     // p_t
-    spdlog::info("{}", "p[1]=");
-    spdlog::info("{}", p[1]);
-    throw; */
+    spdlog::info("{}", "p[1][0]=");
+    spdlog::info("{}", p[1][0]);
+    spdlog::info("{}", "p[1][1]=");
+    spdlog::info("{}", p[1][1]);
+    throw;
 
     // connect final polarization vector to event code
     event.set_polarization_l({p[0][0].real(), p[0][1].real()});
