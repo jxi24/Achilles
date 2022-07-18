@@ -295,14 +295,13 @@ void achilles::EventGen::GenerateEvents() {
     if (anti) {
         // print results
         fmt::print("Polarization_L (k = 0) = {;^8.5e} +/- {:^8.5e}\n", Polarization_l[0].Mean(), Polarization_l[0].Error());
-        fmt::print("Polarization T (k = 0) = {;^8.5e} +/- {:^8.5e}\n", Polarization_t[0].Mean(), Polarization_t[0].Error());
+        fmt::print("Polarization_T (k = 0) = {;^8.5e} +/- {:^8.5e}\n", Polarization_t[0].Mean(), Polarization_t[0].Error());
         // export results to file
         try {
             std::cout << "Writing data to file" << "\n";
-            std::ofstream anti_tau_data("/Users/sherry/Desktop/Fermilab/Achilles/build/anti_tau_data.txt", std::ofstream::out);
+            std::ofstream anti_tau_data("/Users/sherry/Desktop/Fermilab/anti_tau_data.txt", std::ofstream::out);
             if (anti_tau_data.is_open()) {
-                anti_tau_data << Polarization_l[0].Mean() << "\t" <<  Polarization_t[0].Mean() << "\t" << Polarization_l[0].Error() << "\t" 
-                << Polarization_t[0].Error() << "\n";
+                anti_tau_data << Polarization_l[0].Mean() << "\t" << Polarization_l[0].Error() << "\n";
             }
             else {
                 std::cout << "There was a problem opening the file" << "\n";
@@ -320,14 +319,12 @@ void achilles::EventGen::GenerateEvents() {
         // print results
         fmt::print("Polarization_L (k = 1) = {;^8.5e} +/- {:^8.5e}\n", Polarization_l[1].Mean(), Polarization_l[1].Error());
         fmt::print("Polarization_T (k = 1) = {;^8.5e} +/- {:^8.5e}\n", Polarization_t[1].Mean(), Polarization_t[1].Error());
-
         // export results to file
         try {
             std::cout << "Writing data to file" << "\n";
-            std::ofstream tau_data("/Users/sherry/Desktop/Fermilab/Achilles/build/tau_data.txt", std::ofstream::out);
+            std::ofstream tau_data("/Users/sherry/Desktop/Fermilab/tau_data.txt", std::ofstream::out);
             if (tau_data.is_open()) {
-                tau_data << Polarization_l[1].Mean() << "\t" <<  Polarization_t[1].Mean() << "\t" << Polarization_l[1].Error() << "\t" 
-                << Polarization_t[1].Error() << "\n";
+                tau_data << Polarization_l[1].Mean() << "\t" << Polarization_l[1].Error() << "\n";
             }
             else {
                 std::cout << "There was a problem opening the file" << "\n";
