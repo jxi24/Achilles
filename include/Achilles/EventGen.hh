@@ -60,7 +60,7 @@ class EventGen {
         // array keeping track of p_T StatsData objects for k = 0 and k = 1
         std::array<StatsData, 2> Polarization_t;
         // array keeping track of amps2[k]
-        std::array<std::complex<double>, 2> Amps2;
+        std::array<double, 2> Amps2;
 };
 
 }
