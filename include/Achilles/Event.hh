@@ -81,6 +81,10 @@ class Event {
         void set_polarization_l(std::array<double, 2> new_polarization);
         // mutator, modifies an array of polarization_l for k = 0 and k = 1
         void set_polarization_t(std::array<double, 2> new_polarization);
+        // accessor, returns amps2[k]
+        std::array<std::complex<double>, 2> get_amps2();
+        // mutator, defines amps2[k]
+        void set_amps2(std::array<std::complex<double>, 2> new_amps2);
 
     private:
         std::vector<double> EventProbs() const;
@@ -98,6 +102,8 @@ class Event {
         // arrays keeping track of p_l and p_t for k = 0 and k = 1
         std::array<double, 2> m_polarization_l{};
         std::array<double, 2> m_polarization_t{};
+        // array keeping track of amps2[k]
+        std::array<std::complex<double>, 2> m_amps2{};
 };
 
 }

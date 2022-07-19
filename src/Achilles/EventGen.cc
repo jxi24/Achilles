@@ -291,8 +291,8 @@ void achilles::EventGen::GenerateEvents() {
     // 3. use line from HardScattering
     // TODO: replace with variable
     bool anti = ((scattering -> Process().m_ids)[0].AsInt() < 0);
-    // if anti tau neutrino
-    if (anti) {
+    // if anti tau neutrino and amps2[0] is not nan
+    if ((anti) && Amps2[0] == Amps2[0]) {
         // print results
         // fmt::print("Beam Energy = {;^8.5e}", beam->Flux(-24, std::vector<double> (1, 2)));
         fmt::print("Beam Energy = {;^8.5e}", config["Beams"][0]["Beam"]["Beam Params"]["Energy"].as<double>());
@@ -316,8 +316,8 @@ void achilles::EventGen::GenerateEvents() {
         std::cout << "Press any key to exit...\n";
         getchar();
     }
-    // if tau neutrino
-    else {
+    // if tau neutrino and Amps2[1] is not nan
+    else if ((!anti) && (Amps2[1] == Amps2[1])) {
         // print results
         fmt::print("Beam Energy = {;^8.5e}", config["Beams"][0]["Beam"]["Beam Params"]["Energy"].as<double>());
         fmt::print("Polarization_L (k = 1) = {;^8.5e} +/- {:^8.5e}\n", Polarization_l[1].Mean(), Polarization_l[1].Error());
@@ -445,8 +445,11 @@ double achilles::EventGen::GenerateEvent(const std::vector<FourVector> &mom, con
             writer -> Write(event);
             // TODO: generalize to hadronCurrent.size()
             for (size_t k = 0; k < 2; ++k) {
+                // update polarization
                 Polarization_l[k] += event.get_polarization_l()[k];
                 Polarization_t[k] += event.get_polarization_t()[k];
+                // update amps2[k]
+                Amps2[k] = event.get_amps2()[k];
             }
         }
     }

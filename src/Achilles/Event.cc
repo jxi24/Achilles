@@ -141,4 +141,12 @@ void Event::set_polarization_t(std::array<double, 2> new_polarization) {
     m_polarization_t = new_polarization;
 }
 
+std::array<std::complex<double>, 2> Event::get_amps2() {
+    return m_amps2;
+}
+
+void Event::set_amps2(std::array<std::complex<double>, 2> new_amps2) {
+    m_amps2 = new_amps2;
+}
+
 

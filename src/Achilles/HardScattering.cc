@@ -520,22 +520,23 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
         for(size_t k = 0; k < hadronCurrent.size(); ++k) {
             if ( (amps2[k] != 0) && (amps2[k] == amps2[k]) ) {
                 p[i][k] = p_num[i][k] / amps2[k];
+                //spdlog::info("{}", "amps2[k] is valid");
             }
             else if (amps2[k] == 0) {
+                //spdlog::info("{}", "amps2[k] == 0");
                 p[i][k] = 0;
-                spdlog::info("{}", "amps2[k] = 0");
             }
             else {
                 p[i][k] = 0;
-                spdlog::info("{}", "amps2[k] is nan");
-                throw;
+                // spdlog::info("{}", "amps2[k] is nan");
+                // throw;
             }
         }  
     } 
 
     // print + check final polarization vector
     // p_l
-    spdlog::info("{}", "p[0][0]=");
+    /* spdlog::info("{}", "p[0][0]=");
     spdlog::info("{}", p[0][0]);
     spdlog::info("{}", "p[0][1]=");
     spdlog::info("{}", p[0][1]);
@@ -544,11 +545,15 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
     spdlog::info("{}", p[1][0]);
     spdlog::info("{}", "p[1][1]=");
     spdlog::info("{}", p[1][1]);
-    throw;
+    throw; */
 
     // connect final polarization vector to event code
     event.set_polarization_l({p[0][0].real(), p[0][1].real()});
     event.set_polarization_t({p[1][0].real(), p[1][1].real()});
+
+    // send amps2[k] info to event gen
+    event.set_amps2( {amps2[0], amps2[1]} );
+    // event gen only exports value if amps2[k] is not nan
 
     double spin_avg = 1;
     if(!ParticleInfo(m_leptonicProcess.m_ids[0]).IsNeutrino()) spin_avg *= 2;
