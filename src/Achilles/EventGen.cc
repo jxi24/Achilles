@@ -272,6 +272,12 @@ void achilles::EventGen::Initialize() {
     // }
 }
 
+double achilles::EventGen::PropogateError(double p_1, double p_2, double error_1, double error_2) {
+    double num_squared = 2 * pow(p_1, 2) * pow(error_1, 2) + 2 * pow(p_2, 2) * pow(error_2, 2);
+    double denom_squared = pow(p_1, 2) + pow(p_2, 2);
+    return ((0.5 * sqrt(num_squared)) / sqrt(denom_squared));
+}
+
 void achilles::EventGen::GenerateEvents() {
     outputEvents = true;
     runCascade = config["Cascade"]["Run"].as<bool>();
@@ -307,7 +313,7 @@ void achilles::EventGen::GenerateEvents() {
             std::cerr << msg << "\n";
         }
         std::cout << "Done!\n";
-        std::cout << "Press any key to exit...\n";
+        std::cout << "Press enter to exit...\n";
         getchar();
     }
     // if tau neutrino and Amps2[1] is not nan
@@ -316,6 +322,8 @@ void achilles::EventGen::GenerateEvents() {
         fmt::print("Beam Energy = {:^8.5e}\n", config["Beams"][0]["Beam"]["Beam Params"]["Energy"].as<double>());
         fmt::print("Polarization_L (k = 1) = {:^8.5e} +/- {:^8.5e}\n", Polarization_l[1].Mean(), Polarization_l[1].Error());
         fmt::print("Polarization_T (k = 1) = {:^8.5e} +/- {:^8.5e}\n", Polarization_t[1].Mean(), Polarization_t[1].Error());
+        fmt::print("Degree of Polarization (k = 1) = {:^8.5e} +/- {:^8.5e}\n", sqrt( pow(Polarization_l[1].Mean(), 2) + pow(Polarization_t[1].Mean(), 2) ),
+        PropogateError(Polarization_l[1].Mean(), Polarization_t[1].Mean(), Polarization_l[1].Error(), Polarization_t[1].Error()));
         // export results to file
         try {
             std::cout << "Writing data to file" << "\n";
@@ -331,7 +339,7 @@ void achilles::EventGen::GenerateEvents() {
             std::cerr << msg << "\n";
         }
         std::cout << "Done!\n";
-        std::cout << "Press any key to exit...\n";
+        std::cout << "Press enter to exit...\n";
         getchar();
     }
 } 
