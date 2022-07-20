@@ -40,6 +40,8 @@ class Event {
         MOCK void InitializeHadrons(const Process_Info&);
         void Finalize();
 
+        
+
         MOCK const NuclearRemnant &Remnant() const { return m_remnant; }
 
         MOCK const vMomentum &Momentum() const { return m_mom; }
@@ -72,6 +74,8 @@ class Event {
                 && m_me == other.m_me && m_vWgt == other.m_meWgt
                 && m_leptons == other.m_leptons;
         }
+        std::vector<double>& PolarizationL() {return m_polarization_l;}
+        std::vector<double>& PolarizationT() {return m_polarization_t;}
 
     private:
         std::vector<double> EventProbs() const;
@@ -86,6 +90,7 @@ class Event {
         double m_vWgt{}, m_meWgt{};
         vParticles m_leptons{};
         vParticles m_history{};
+        std::vector<double> m_polarization_l{}, m_polarization_t{};
 };
 
 }

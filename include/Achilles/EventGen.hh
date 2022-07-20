@@ -54,6 +54,7 @@ class EventGen {
         YAML::Node config;
 
         std::shared_ptr<EventWriter> writer;
+        StatsData polarizationL0, polarizationL1, polarizationT0, polarizationT1;
 };
 
 }

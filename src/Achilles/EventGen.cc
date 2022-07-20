@@ -278,6 +278,18 @@ void achilles::EventGen::GenerateEvents() {
     fmt::print("Integral = {:^8.5e} +/- {:^8.5e} ({:^8.5e} %)\n",
                result.results.back().Mean(), result.results.back().Error(),
                result.results.back().Error() / result.results.back().Mean()*100);
+    fmt::print("PolarizationT0 = {:^8.5e} +/- {:^8.5e}\n",
+                polarizationT0.Mean(), polarizationT0.Error());
+    fmt::print("PolarizationT1 = {:^8.5e} +/- {:^8.5e}\n",
+                polarizationT1.Mean(), polarizationT1.Error());
+    fmt::print("PolarizationL0 = {:^8.5e} +/- {:^8.5e}\n",
+                polarizationL0.Mean(), polarizationL0.Error());
+    fmt::print("PolarizationL1 = {:^8.5e} +/- {:^8.5e}\n",
+                polarizationL1.Mean(), polarizationL1.Error());
+    std::ofstream outfile1;
+    outfile1.open("/mnt/c/Users/rusmi/Achilles/test.txt", std::ios_base::out | std::ios_base::app); 
+    outfile1 << polarizationT0.Mean() << '\n' << polarizationT1.Mean() << '\n'<< polarizationL0.Mean() << '\n' << polarizationL1.Mean() << '\n' << std::endl;
+    outfile1.close();
 }
 
 double achilles::EventGen::GenerateEvent(const std::vector<FourVector> &mom, const double &wgt) {
@@ -381,6 +393,10 @@ double achilles::EventGen::GenerateEvent(const std::vector<FourVector> &mom, con
             // Keep a running total of the number of surviving events
             event.Finalize();
             writer -> Write(event);
+            polarizationL0 += event.PolarizationL()[0];
+            polarizationL1 += event.PolarizationL()[1];
+            polarizationT0 += event.PolarizationT()[0];
+            polarizationT1 += event.PolarizationT()[1];
         }
     }
 

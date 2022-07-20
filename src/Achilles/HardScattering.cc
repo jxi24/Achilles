@@ -1,5 +1,6 @@
 #include <iostream>
 #include <utility>
+#include  <fstream>
 
 #include "Achilles/HardScattering.hh"
 #include "Achilles/Constants.hh"
@@ -276,8 +277,8 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
     }  
 
 
-    std::complex<double> pL;
-    std::complex<double> pT;
+    std::vector<double> pL;
+    std::vector<double> pT;
     std::array<std::complex<double>, 2> wl{};
 
     for(const auto &ltensor : leptonTensor) {
@@ -302,28 +303,27 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
             for(size_t alpha = 0; alpha < 4; ++alpha) {
                 for(size_t beta = 0; beta < 4; ++beta) {
                     std::complex<double> i = {0,1};
-                    if (amps2[1] == 0) {
-                        pL = 0;
-                        pT = 0;
-                    }
-                    else {
-                        pL += ((mass_out)*(hL[mu]*lept_in[nu] + lept_in[mu]*hL[nu] - sign*lept_in*hL 
-                        - LeviCivita(mu,nu,alpha,beta)*hL[alpha]*lept_in[beta]*i)*hadronTensor[{-24,-24}][1][mu][nu])/(real(wl[1]));
-                        pT += ((mass_out)*(hT[mu]*lept_in[nu] + lept_in[mu]*hL[nu] - sign*lept_in*hT 
-                        + LeviCivita(mu,nu,alpha,beta)*hT[alpha]*lept_in[beta]*i)*hadronTensor[{-24,-24}][1][mu][nu])/(real(wl[1]));
+                    pL.resize(hadronCurrent.size());
+                    pT.resize(hadronCurrent.size());
+                    for(size_t k = 0; k < hadronCurrent.size(); ++k) {
+                        if (amps2[1] == 0) {
+                            pL[k] = 0;
+                            pT[k] = 0;
+                        }
+                        else {
+                            pL[k] += real(((mass_out)*(hL[mu]*lept_in[nu] + lept_in[mu]*hL[nu] - sign*lept_in*hL 
+                            - LeviCivita(mu,nu,alpha,beta)*hL[alpha]*lept_in[beta]*i)*hadronTensor[{-24,-24}][k][mu][nu]))/(real(wl[k]));
+                            pT[k] += real(((mass_out)*(hT[mu]*lept_in[nu] + lept_in[mu]*hL[nu] - sign*lept_in*hT 
+                            + LeviCivita(mu,nu,alpha,beta)*hT[alpha]*lept_in[beta]*i)*hadronTensor[{-24,-24}][k][mu][nu]))/(real(wl[k]));
+                        }
                     }   
                 }
             }                   
         }
     }
 
-    spdlog::info("wl and amps2");
-    spdlog::info(real(wl[1]));
-    spdlog::info(amps2[1]);
-    spdlog::info("end");
-    spdlog::info(pL);
-    spdlog::info(pT);
-    spdlog::info(pL+pT);
+    event.PolarizationL() = pL;
+    event.PolarizationT() = pT;
 
 
 
