@@ -33,6 +33,8 @@ class EventGen {
     public:
         EventGen(const std::string&, std::vector<std::string>);
         void Initialize();
+        // helper function to calculate new error
+        double PropogateError(const double p_1, const double p_2, const double error_1, const double error_2) const;
         void GenerateEvents();
 
     private:

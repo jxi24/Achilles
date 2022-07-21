@@ -272,7 +272,7 @@ void achilles::EventGen::Initialize() {
     // }
 }
 
-double achilles::EventGen::PropogateError(double p_1, double p_2, double error_1, double error_2) {
+double achilles::EventGen::PropogateError(const double p_1, const double p_2, const double error_1, const double error_2) const {
     double num_squared = 2 * pow(p_1, 2) * pow(error_1, 2) + 2 * pow(p_2, 2) * pow(error_2, 2);
     double denom_squared = pow(p_1, 2) + pow(p_2, 2);
     return ((0.5 * sqrt(num_squared)) / sqrt(denom_squared));
