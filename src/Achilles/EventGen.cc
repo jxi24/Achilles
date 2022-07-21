@@ -303,7 +303,7 @@ void achilles::EventGen::GenerateEvents() {
         // export results to file
         try {
             std::cout << "Writing data to file" << "\n";
-            std::ofstream anti_tau_data("/Users/sherry/Desktop/Fermilab/anti_tau_data.txt", std::ofstream::out);
+            std::ofstream anti_tau_data("/Users/sherry/Desktop/Fermilab/anti_tau_data.txt", std::ios_base::app);
             if (anti_tau_data.is_open()) {
                 // anti_tau_data << config["Beams"][0]["Beam"]["Beam Params"]["Energy"].as<double>() << "\t" << Polarization_l[0].Mean() << "\t" << Polarization_l[0].Error() << "\n";
                 anti_tau_data << config["Beams"][0]["Beam"]["Beam Params"]["Energy"].as<double>() << "\t" << sqrt( pow(Polarization_l[0].Mean(), 2) + pow(Polarization_t[0].Mean(), 2) )
@@ -331,7 +331,7 @@ void achilles::EventGen::GenerateEvents() {
         // export results to file
         try {
             std::cout << "Writing data to file" << "\n";
-            std::ofstream tau_data("/Users/sherry/Desktop/Fermilab/tau_data.txt", std::ofstream::out);
+            std::ofstream tau_data("/Users/sherry/Desktop/Fermilab/tau_data.txt", std::ios_base::app);
             if (tau_data.is_open()) {
                 // tau_data << config["Beams"][0]["Beam"]["Beam Params"]["Energy"].as<double>() << "\t" << Polarization_l[1].Mean() << "\t" << Polarization_l[1].Error() << "\n";
                 tau_data << config["Beams"][0]["Beam"]["Beam Params"]["Energy"].as<double>() << "\t" << sqrt( pow(Polarization_l[1].Mean(), 2) + pow(Polarization_t[1].Mean(), 2) )
