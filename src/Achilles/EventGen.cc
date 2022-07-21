@@ -298,12 +298,16 @@ void achilles::EventGen::GenerateEvents() {
         fmt::print("Beam Energy = {:^8.5e}\n", config["Beams"][0]["Beam"]["Beam Params"]["Energy"].as<double>());
         fmt::print("Polarization_L (k = 0) = {:^8.5e} +/- {:^8.5e}\n", Polarization_l[0].Mean(), Polarization_l[0].Error());
         fmt::print("Polarization_T (k = 0) = {:^8.5e} +/- {:^8.5e}\n", Polarization_t[0].Mean(), Polarization_t[0].Error());
+        fmt::print("Degree of Polarization (k = 0) = {:^8.5e} +/- {:^8.5e}\n", sqrt( pow(Polarization_l[0].Mean(), 2) + pow(Polarization_t[0].Mean(), 2) ),
+        PropogateError(Polarization_l[0].Mean(), Polarization_t[0].Mean(), Polarization_l[0].Error(), Polarization_t[0].Error()));
         // export results to file
         try {
             std::cout << "Writing data to file" << "\n";
             std::ofstream anti_tau_data("/Users/sherry/Desktop/Fermilab/anti_tau_data.txt", std::ofstream::out);
             if (anti_tau_data.is_open()) {
-                anti_tau_data << config["Beams"][0]["Beam"]["Beam Params"]["Energy"].as<double>() << "\t" << Polarization_l[0].Mean() << "\t" << Polarization_l[0].Error() << "\n";
+                // anti_tau_data << config["Beams"][0]["Beam"]["Beam Params"]["Energy"].as<double>() << "\t" << Polarization_l[0].Mean() << "\t" << Polarization_l[0].Error() << "\n";
+                anti_tau_data << config["Beams"][0]["Beam"]["Beam Params"]["Energy"].as<double>() << "\t" << sqrt( pow(Polarization_l[0].Mean(), 2) + pow(Polarization_t[0].Mean(), 2) )
+                << "\t" << PropogateError(Polarization_l[0].Mean(), Polarization_t[0].Mean(), Polarization_l[0].Error(), Polarization_t[0].Error()) << "\n";
             }
             else {
                 std::cout << "There was a problem opening the file" << "\n";
@@ -329,7 +333,9 @@ void achilles::EventGen::GenerateEvents() {
             std::cout << "Writing data to file" << "\n";
             std::ofstream tau_data("/Users/sherry/Desktop/Fermilab/tau_data.txt", std::ofstream::out);
             if (tau_data.is_open()) {
-                tau_data << config["Beams"][0]["Beam"]["Beam Params"]["Energy"].as<double>() << "\t" << Polarization_l[1].Mean() << "\t" << Polarization_l[1].Error() << "\n";
+                // tau_data << config["Beams"][0]["Beam"]["Beam Params"]["Energy"].as<double>() << "\t" << Polarization_l[1].Mean() << "\t" << Polarization_l[1].Error() << "\n";
+                tau_data << config["Beams"][0]["Beam"]["Beam Params"]["Energy"].as<double>() << "\t" << sqrt( pow(Polarization_l[1].Mean(), 2) + pow(Polarization_t[1].Mean(), 2) )
+                << "\t" << PropogateError(Polarization_l[1].Mean(), Polarization_t[1].Mean(), Polarization_l[1].Error(), Polarization_t[1].Error()) << "\n";
             }
             else {
                 std::cout << "There was a problem opening the file" << "\n";
