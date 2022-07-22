@@ -1,6 +1,7 @@
 #include <iostream>
 #include <utility>
 #include  <fstream>
+#include <cmath>
 
 #include "Achilles/HardScattering.hh"
 #include "Achilles/Constants.hh"
@@ -246,7 +247,7 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
     auto direction_in = lept_in.Vec3().Unit();
     auto direction_out = lept_out.Vec3().Unit();
 
-    auto hL = 1/ mass_out * FourVector(energy_in * direction_out, lept_out.Vec3().Magnitude());
+    auto hL = FourVector((1/ mass_out) * energy_in * direction_out, (1/ mass_out) * lept_out.Vec3().Magnitude());
     auto hT = FourVector(direction_out.Cross(direction_out.Cross(direction_in)), 0);
 
     std::map<std::pair<PID, PID>, std::vector<std::array<std::array<std::complex<double>,4>,4>>> hadronTensor;
@@ -277,8 +278,6 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
     }  
 
 
-    std::vector<double> pL;
-    std::vector<double> pT;
     std::array<std::complex<double>, 2> wl{};
 
     for(const auto &ltensor : leptonTensor) {
@@ -297,6 +296,11 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
     }
 
     // Contract W^{\mu\nu} with L_{\mu\nu} => Numerator of P_(L,T)
+    // getting values for the plot that says theta=16, range of pm .1
+
+    std::vector<double> pL;
+    std::vector<double> pT;
+ 
     double sign = 1;
     for(size_t mu = 0; mu < 4; ++mu) {
         for(size_t nu = 0; nu < 4; ++nu) {
@@ -311,20 +315,26 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
                             pT[k] = 0;
                         }
                         else {
-                            pL[k] += real(((mass_out)*(hL[mu]*lept_in[nu] + lept_in[mu]*hL[nu] - sign*lept_in*hL 
+                            double coupl2 = pow(Constant::ee/(Constant::sw*sqrt(2)), 2);
+                            double prefact = coupl2/pow(Constant::MW, 4);
+                            pL[k] += prefact * real(((mass_out)*(hL[mu]*lept_in[nu] + lept_in[mu]*hL[nu] - sign*lept_in*hL 
                             - LeviCivita(mu,nu,alpha,beta)*hL[alpha]*lept_in[beta]*i)*hadronTensor[{-24,-24}][k][mu][nu]))/(real(wl[k]));
-                            pT[k] += real(((mass_out)*(hT[mu]*lept_in[nu] + lept_in[mu]*hL[nu] - sign*lept_in*hT 
+                            pT[k] += prefact * real(((mass_out)*(hT[mu]*lept_in[nu] + lept_in[mu]*hT[nu] - sign*lept_in*hT 
                             + LeviCivita(mu,nu,alpha,beta)*hT[alpha]*lept_in[beta]*i)*hadronTensor[{-24,-24}][k][mu][nu]))/(real(wl[k]));
-                        }
-                    }   
-                }
-            }                   
+                        }   
+                    }         
+                }                   
+            }
         }
     }
-
     event.PolarizationL() = pL;
-    event.PolarizationT() = pT;
+    event.PolarizationT() = pT; 
 
+
+    //spdlog::info("pL then pT");
+    //spdlog::info(pL[1]);
+    //spdlog::info(pT[1]);
+    
 
 
     double spin_avg = 1;
