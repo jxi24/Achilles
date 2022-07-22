@@ -438,6 +438,10 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
     // calculate numerator
     std::vector<std::array<std::complex<double>, 2>> p_num(2);
 
+    // calculate prefactor and coupling
+    double coupl2 = pow(Constant::ee/(Constant::sw*sqrt(2)), 2);
+    double prefact = coupl2/pow(Constant::MW, 4);
+
     for(size_t mu = 0; mu < 4; ++mu) {
         for(size_t nu = 0; nu < 4; ++nu) {
             for(size_t k = 0; k < hadronCurrent.size(); ++k) {
@@ -454,8 +458,8 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
                 spdlog::info("{}", iehk[1][mu][nu]);
                 spdlog::info("{}", hadronTensor[{-24, -24}][k][mu][nu]); */
                 if ( (amps2[k] != 0) && (amps2[k] == amps2[k]) ) {
-                    p_num[0][k] += mass_out * (hkkh[0][mu][nu] - gkh[0][mu][nu] + iehk[0][mu][nu]) * hadronTensor[{-24, -24}][k][mu][nu];
-                    p_num[1][k] += mass_out * (hkkh[1][mu][nu] - gkh[1][mu][nu] - iehk[1][mu][nu]) * hadronTensor[{-24, -24}][k][mu][nu];
+                    p_num[0][k] += prefact * mass_out * (hkkh[0][mu][nu] - gkh[0][mu][nu] + iehk[0][mu][nu]) * hadronTensor[{-24, -24}][k][mu][nu];
+                    p_num[1][k] += prefact * mass_out * (hkkh[1][mu][nu] - gkh[1][mu][nu] - iehk[1][mu][nu]) * hadronTensor[{-24, -24}][k][mu][nu];
                 }
                 else {
                     p_num[0][k] = 0;
