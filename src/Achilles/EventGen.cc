@@ -289,9 +289,53 @@ void achilles::EventGen::GenerateEvents() {
                result.results.back().Mean(), result.results.back().Error(),
                result.results.back().Error() / result.results.back().Mean()*100);
 
-    // REPRODUCE FIG 5 PANEL 2
+    // CREATE HISTOGRAM OF Q
     bool anti = ((scattering -> Process().m_ids)[0].AsInt() < 0);
-    if ((!anti) && (Amps2[1] == Amps2[1])) {
+    if ( ((!anti) && (Amps2[1] == Amps2[1])) || ((anti) && Amps2[0] == Amps2[0]) ) {
+        fmt::print("q_0 = {:^8.5e}\n", Q0);
+        try {
+            std::cout << "Writing data to file" << "\n";
+            std::ofstream q_hist("/Users/sherry/Desktop/Fermilab/q_hist.txt", std::ios_base::app);
+            if (q_hist.is_open()) {
+                q_hist << Q0 << "\n";
+            }
+            else {
+                std::cout << "There was a problem opening the file" << "\n";
+            }
+        }
+        catch (const char* msg) {
+            std::cerr << msg << "\n";
+        }
+        std::cout << "Done!\n";
+
+    }
+
+    /* // REPRODUCE FIG 5 PANEL 2
+    bool anti = ((scattering -> Process().m_ids)[0].AsInt() < 0);
+    if ((anti) && Amps2[0] == Amps2[0]) {
+        // print results
+        fmt::print("Beam Energy = {:^8.5e}\n", config["Beams"][0]["Beam"]["Beam Params"]["Energy"].as<double>());
+        fmt::print("q_0 = {:^8.5e}\n", Q0);
+        fmt::print("Polarization_L (k = 0) = {:^8.5e} +/- {:^8.5e}\n", Polarization_l[0].Mean(), Polarization_l[0].Error());
+        // export resuults to file
+        try {
+            std::cout << "Writing data to file" << "\n";
+            std::ofstream fig5_anti_tau_data("/Users/sherry/Desktop/Fermilab/fig5_anti_tau_data.txt", std::ios_base::app);
+            if (fig5_anti_tau_data.is_open()) {
+                // anti_tau_data << config["Beams"][0]["Beam"]["Beam Params"]["Energy"].as<double>() << "\t" << Polarization_l[0].Mean() << "\t" << Polarization_l[0].Error() << "\n";
+                fig5_anti_tau_data << config["Beams"][0]["Beam"]["Beam Params"]["Energy"].as<double>() << "\t" << Q0 << "\t" << Polarization_l[0].Mean() << "\t"
+                << Polarization_l[0].Error() << "\n";
+            }
+            else {
+                std::cout << "There was a problem opening the file" << "\n";
+            }
+        }
+        catch (const char* msg) {
+            std::cerr << msg << "\n";
+        }
+        std::cout << "Done!\n";
+    }
+    else if ((!anti) && (Amps2[1] == Amps2[1]) && (Q0 < 2.1) && (Q0 > 1.9)) {
         // print results
         fmt::print("Beam Energy = {:^8.5e}\n", config["Beams"][0]["Beam"]["Beam Params"]["Energy"].as<double>());
         fmt::print("q_0 = {:^8.5e}\n", Q0);
@@ -313,9 +357,7 @@ void achilles::EventGen::GenerateEvents() {
             std::cerr << msg << "\n";
         }
         std::cout << "Done!\n";
-        std::cout << "Press enter to exit...\n";
-        getchar();
-    }
+    } */
 
     /* 
     // REPRODUCE FIG 7
@@ -348,8 +390,6 @@ void achilles::EventGen::GenerateEvents() {
             std::cerr << msg << "\n";
         }
         std::cout << "Done!\n";
-        std::cout << "Press enter to exit...\n";
-        getchar();
     }
     // if tau neutrino and Amps2[1] is not nan
     else if ((!anti) && (Amps2[1] == Amps2[1])) {
@@ -376,8 +416,6 @@ void achilles::EventGen::GenerateEvents() {
             std::cerr << msg << "\n";
         }
         std::cout << "Done!\n";
-        std::cout << "Press enter to exit...\n";
-        getchar();
     } */
 } 
 
