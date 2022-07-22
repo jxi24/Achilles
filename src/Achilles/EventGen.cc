@@ -295,7 +295,7 @@ void achilles::EventGen::GenerateEvents() {
         // print results
         fmt::print("Beam Energy = {:^8.5e}\n", config["Beams"][0]["Beam"]["Beam Params"]["Energy"].as<double>());
         fmt::print("q_0 = {:^8.5e}\n", Q0);
-        fmt::print("Polarization_L (k = 0) = {:^8.5e} +/- {:^8.5e}\n", Polarization_l[1].Mean(), Polarization_l[1].Error());
+        fmt::print("Polarization_L (k = 1) = {:^8.5e} +/- {:^8.5e}\n", Polarization_l[1].Mean(), Polarization_l[1].Error());
         // export resuults to file
         try {
             std::cout << "Writing data to file" << "\n";
@@ -490,7 +490,7 @@ double achilles::EventGen::GenerateEvent(const std::vector<FourVector> &mom, con
                 // update amps2[k]
                 Amps2[k] = event.get_amps2()[k];
                 // update q_0
-                Q0 = event.get_q0();
+                Q0 = event.Momentum()[1].E() - event.Momentum().back().E();
             }
         }
     }

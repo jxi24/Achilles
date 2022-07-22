@@ -85,10 +85,6 @@ class Event {
         std::array<double, 2> get_amps2();
         // mutator, defines amps2[k]
         void set_amps2(std::array<double, 2> new_amps2);
-        // accessor, returns q^0
-        double get_q0();
-        // mutator, defines q^0
-        double set_q0(double new_q0);
 
     private:
         std::vector<double> EventProbs() const;
@@ -109,7 +105,6 @@ class Event {
         // array keeping track of amps2[k]
         std::array<double, 2> m_amps2{};
         // double keeping track of q^0
-        double m_q0{};
 };
 
 }

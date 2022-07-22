@@ -559,10 +559,6 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
     event.set_amps2( {amps2[0], amps2[1]} );
     // event gen only exports value if amps2[k] is not nan
 
-    // calculate q^0 and send to EventGen
-    double q0 = energy_in - energy_out;
-    event.set_q0(q0);
-
     double spin_avg = 1;
     if(!ParticleInfo(m_leptonicProcess.m_ids[0]).IsNeutrino()) spin_avg *= 2;
     if(m_nuclear -> NSpins() > 1) spin_avg *= 2;
