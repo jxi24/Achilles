@@ -288,6 +288,37 @@ void achilles::EventGen::GenerateEvents() {
     fmt::print("Integral = {:^8.5e} +/- {:^8.5e} ({:^8.5e} %)\n",
                result.results.back().Mean(), result.results.back().Error(),
                result.results.back().Error() / result.results.back().Mean()*100);
+
+    // REPRODUCE FIG 5 PANEL 2
+    bool anti = ((scattering -> Process().m_ids)[0].AsInt() < 0);
+    if ((!anti) && (Amps2[1] == Amps2[1])) {
+        // print results
+        fmt::print("Beam Energy = {:^8.5e}\n", config["Beams"][0]["Beam"]["Beam Params"]["Energy"].as<double>());
+        fmt::print("q_0 = {:^8.5e}\n", Q0);
+        fmt::print("Polarization_L (k = 0) = {:^8.5e} +/- {:^8.5e}\n", Polarization_l[1].Mean(), Polarization_l[1].Error());
+        // export resuults to file
+        try {
+            std::cout << "Writing data to file" << "\n";
+            std::ofstream fig5_tau_data("/Users/sherry/Desktop/Fermilab/fig5_tau_data.txt", std::ios_base::app);
+            if (fig5_tau_data.is_open()) {
+                // tau_data << config["Beams"][0]["Beam"]["Beam Params"]["Energy"].as<double>() << "\t" << Polarization_l[1].Mean() << "\t" << Polarization_l[1].Error() << "\n";
+                fig5_tau_data << config["Beams"][0]["Beam"]["Beam Params"]["Energy"].as<double>() << "\t" << Q0 << "\t" << Polarization_l[1].Mean() << "\t"
+                << Polarization_l[1].Error() << "\n";
+            }
+            else {
+                std::cout << "There was a problem opening the file" << "\n";
+            }
+        }
+        catch (const char* msg) {
+            std::cerr << msg << "\n";
+        }
+        std::cout << "Done!\n";
+        std::cout << "Press enter to exit...\n";
+        getchar();
+    }
+
+    /* 
+    // REPRODUCE FIG 7
     // if PID = 18, anti tau neutrino --> k = 0
     // if PID = 16, tau neutrino --> k = 1
     // TODO: replace with variable
@@ -303,7 +334,7 @@ void achilles::EventGen::GenerateEvents() {
         // export results to file
         try {
             std::cout << "Writing data to file" << "\n";
-            std::ofstream anti_tau_data("/Users/sherry/Desktop/Fermilab/anti_tau_data.txt", std::ios_base::app);
+            std::ofstream anti_tau_data("/Users/sherry/Desktop/Fermilab/fig7_anti_tau_data.txt", std::ios_base::app);
             if (anti_tau_data.is_open()) {
                 // anti_tau_data << config["Beams"][0]["Beam"]["Beam Params"]["Energy"].as<double>() << "\t" << Polarization_l[0].Mean() << "\t" << Polarization_l[0].Error() << "\n";
                 anti_tau_data << config["Beams"][0]["Beam"]["Beam Params"]["Energy"].as<double>() << "\t" << sqrt( pow(Polarization_l[0].Mean(), 2) + pow(Polarization_t[0].Mean(), 2) )
@@ -322,7 +353,7 @@ void achilles::EventGen::GenerateEvents() {
     }
     // if tau neutrino and Amps2[1] is not nan
     else if ((!anti) && (Amps2[1] == Amps2[1])) {
-        // print results*/
+        // print results
         fmt::print("Beam Energy = {:^8.5e}\n", config["Beams"][0]["Beam"]["Beam Params"]["Energy"].as<double>());
         fmt::print("Polarization_L (k = 1) = {:^8.5e} +/- {:^8.5e}\n", Polarization_l[1].Mean(), Polarization_l[1].Error());
         fmt::print("Polarization_T (k = 1) = {:^8.5e} +/- {:^8.5e}\n", Polarization_t[1].Mean(), Polarization_t[1].Error());
@@ -331,7 +362,7 @@ void achilles::EventGen::GenerateEvents() {
         // export results to file
         try {
             std::cout << "Writing data to file" << "\n";
-            std::ofstream tau_data("/Users/sherry/Desktop/Fermilab/tau_data.txt", std::ios_base::app);
+            std::ofstream tau_data("/Users/sherry/Desktop/Fermilab/fig7_tau_data.txt", std::ios_base::app);
             if (tau_data.is_open()) {
                 // tau_data << config["Beams"][0]["Beam"]["Beam Params"]["Energy"].as<double>() << "\t" << Polarization_l[1].Mean() << "\t" << Polarization_l[1].Error() << "\n";
                 tau_data << config["Beams"][0]["Beam"]["Beam Params"]["Energy"].as<double>() << "\t" << sqrt( pow(Polarization_l[1].Mean(), 2) + pow(Polarization_t[1].Mean(), 2) )
@@ -347,7 +378,7 @@ void achilles::EventGen::GenerateEvents() {
         std::cout << "Done!\n";
         std::cout << "Press enter to exit...\n";
         getchar();
-    }
+    } */
 } 
 
 double achilles::EventGen::GenerateEvent(const std::vector<FourVector> &mom, const double &wgt) {
@@ -458,6 +489,8 @@ double achilles::EventGen::GenerateEvent(const std::vector<FourVector> &mom, con
                 Polarization_t[k] += event.get_polarization_t()[k];
                 // update amps2[k]
                 Amps2[k] = event.get_amps2()[k];
+                // update q_0
+                Q0 = event.get_q0();
             }
         }
     }

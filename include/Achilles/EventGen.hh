@@ -63,6 +63,8 @@ class EventGen {
         std::array<StatsData, 2> Polarization_t;
         // array keeping track of amps2[k]
         std::array<double, 2> Amps2;
+        // double keeping track of q0
+        double Q0;
 };
 
 }

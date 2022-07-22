@@ -149,4 +149,11 @@ void Event::set_amps2(std::array<double, 2> new_amps2) {
     m_amps2 = new_amps2;
 }
 
+double Event::get_q0() {
+    return m_q0;
+}
+
+double Event::set_q0(double new_q0) {
+    m_q0 = new_q0;
+}
 
