@@ -65,6 +65,8 @@ class EventGen {
         std::array<double, 2> Amps2;
         // double keeping track of q0
         double Q0;
+        // double keeping track of theta
+        double Theta;
 };
 
 }

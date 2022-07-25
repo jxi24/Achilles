@@ -278,6 +278,32 @@ double achilles::EventGen::PropogateError(const double p_1, const double p_2, co
     return ((0.5 * sqrt(num_squared)) / sqrt(denom_squared));
 }
 
+/* void achilles::EventGen::MakeHist(int arr[], int n){
+    int max_elem = *std::max_element(arr, arr + n);
+    for (int i = max_elem; i >= 0; i--) {
+        std::cout.width(2);
+        std::cout << std::right << i << " | ";
+        for (int j = 0; j < n; j++) {
+            if (arr[j] >= i) {
+                std::cout << " x ";
+            }
+            else {
+                std::cout << " ";
+            }
+        }
+        std::cout << "\n";
+    }
+    for (int i = 0; i < n + 3; i++) {
+        std::cout << "---";
+        std::cout << "\n";
+        std::cout << " ";
+    }
+    for (int i = 0; i < n; i++) {
+        std::cout.width(2);
+        std::cout << std::right << arr[i] << " ";
+    }
+} */
+
 void achilles::EventGen::GenerateEvents() {
     outputEvents = true;
     runCascade = config["Cascade"]["Run"].as<bool>();
@@ -289,28 +315,44 @@ void achilles::EventGen::GenerateEvents() {
                result.results.back().Mean(), result.results.back().Error(),
                result.results.back().Error() / result.results.back().Mean()*100);
 
-    // CREATE HISTOGRAM OF Q
-    bool anti = ((scattering -> Process().m_ids)[0].AsInt() < 0);
-    if ( ((!anti) && (Amps2[1] == Amps2[1])) || ((anti) && Amps2[0] == Amps2[0]) ) {
-        fmt::print("q_0 = {:^8.5e}\n", Q0);
-        try {
-            std::cout << "Writing data to file" << "\n";
-            std::ofstream q_hist("/Users/sherry/Desktop/Fermilab/q_hist.txt", std::ios_base::app);
-            if (q_hist.is_open()) {
-                q_hist << Q0 << "\n";
-            }
-            else {
-                std::cout << "There was a problem opening the file" << "\n";
-            }
+    /* // CREATE HISTOGRAM OF Q (MOVED TO GenerateEvent)
+    // export data to txt
+    // bool anti = ((scattering -> Process().m_ids)[0].AsInt() < 0);
+    // if ( ((!anti) && (Amps2[1] == Amps2[1])) || ((anti) && Amps2[0] == Amps2[0]) ) {
+    fmt::print("q_0 = {:^8.5e}\n", Q0);
+    try {
+        std::cout << "Writing data to file" << "\n";
+        std::ofstream q_hist("/Users/sherry/Desktop/Fermilab/q_hist_2.txt", std::ios_base::app);
+        if (q_hist.is_open()) {
+            q_hist << Q0 << "\n";
         }
-        catch (const char* msg) {
-            std::cerr << msg << "\n";
+        else {
+            std::cout << "There was a problem opening the file" << "\n";
         }
-        std::cout << "Done!\n";
-
     }
+    catch (const char* msg) {
+        std::cerr << msg << "\n";
+    }
+    std::cout << "Done!\n";*/
+    // }
+    /* // read file from txt into array
+    std::ifstream q_hist_in;
+    q_hist_in.open("q_hist.txt");
+    double q_data[21];
+    double elem;
+    if (q_hist_in.is_open())
+    {
+        int i = 0;
+        while (q_hist_in >> elem) {
+            q_data[i++] = elem;
+        }
+    }
+    fmt::print("{:^8.5e}\n", q_data[0]);
+    fmt::print("{:^8.5e}\n", q_data[10]);
+    fmt::print("{:^8.5e}\n", q_data[20]); */
 
-    /* // REPRODUCE FIG 5 PANEL 2
+
+    /* // REPRODUCE FIG 5 PANEL 2 (MOVED TO GenerateEvent)
     bool anti = ((scattering -> Process().m_ids)[0].AsInt() < 0);
     if ((anti) && Amps2[0] == Amps2[0]) {
         // print results
@@ -359,8 +401,7 @@ void achilles::EventGen::GenerateEvents() {
         std::cout << "Done!\n";
     } */
 
-    /* 
-    // REPRODUCE FIG 7
+    /* // REPRODUCE FIG 7 (WAITING ON JOSH AND NOEMI'S APPROVAL)
     // if PID = 18, anti tau neutrino --> k = 0
     // if PID = 16, tau neutrino --> k = 1
     // TODO: replace with variable
@@ -525,10 +566,45 @@ double achilles::EventGen::GenerateEvent(const std::vector<FourVector> &mom, con
                 // update polarization
                 Polarization_l[k] += event.get_polarization_l()[k];
                 Polarization_t[k] += event.get_polarization_t()[k];
+
                 // update amps2[k]
                 Amps2[k] = event.get_amps2()[k];
-                // update q_0
+
+                /* // update q_0 and produce q_0 hist data
                 Q0 = event.Momentum()[1].E() - event.Momentum().back().E();
+                fmt::print("q_0 = {:^8.5e}\n", Q0);
+                try {
+                    std::cout << "Writing data to file" << "\n";
+                    std::ofstream q_hist("/Users/sherry/Desktop/Fermilab/q_hist_2.txt", std::ios_base::app);
+                    if (q_hist.is_open()) {
+                        q_hist << Q0 << "\n";
+                    }
+                    else {
+                        std::cout << "There was a problem opening the file" << "\n";
+                    }
+                }
+                catch (const char* msg) {
+                    std::cerr << msg << "\n";
+                }
+                std::cout << "Done!\n"; */
+
+                // update theta and produce theta hist data
+                Theta = event.Momentum().back().Theta();
+                fmt::print("theta = {:^8.5e}\n", Theta);
+                try {
+                    std::cout << "Writing data to file" << "\n";
+                    std::ofstream theta_hist("/Users/sherry/Desktop/Fermilab/theta_hist_1.txt", std::ios_base::app);
+                    if (theta_hist.is_open()) {
+                        theta_hist << Theta << "\n";
+                    }
+                    else {
+                        std::cout << "There was a problem opening the file" << "\n";
+                    }
+                }
+                catch (const char* msg) {
+                    std::cerr << msg << "\n";
+                }
+                std::cout << "Done!\n";
             }
         }
     }
