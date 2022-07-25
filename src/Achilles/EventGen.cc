@@ -315,6 +315,10 @@ void achilles::EventGen::GenerateEvents() {
                result.results.back().Mean(), result.results.back().Error(),
                result.results.back().Error() / result.results.back().Mean()*100);
 
+    /* // set Target_Theta
+    std::cout << "Enter target theta (degrees)" << "\n";
+    Target_theta = (double)(getchar()); */
+
     /* // CREATE HISTOGRAM OF Q (MOVED TO GenerateEvent)
     // export data to txt
     // bool anti = ((scattering -> Process().m_ids)[0].AsInt() < 0);
@@ -570,9 +574,9 @@ double achilles::EventGen::GenerateEvent(const std::vector<FourVector> &mom, con
                 // update amps2[k]
                 Amps2[k] = event.get_amps2()[k];
 
-                /* // update q_0 and produce q_0 hist data
+                // update q_0 and produce q_0 hist data
                 Q0 = event.Momentum()[1].E() - event.Momentum().back().E();
-                fmt::print("q_0 = {:^8.5e}\n", Q0);
+                /* fmt::print("q_0 = {:^8.5e}\n", Q0);
                 try {
                     std::cout << "Writing data to file" << "\n";
                     std::ofstream q_hist("/Users/sherry/Desktop/Fermilab/q_hist_2.txt", std::ios_base::app);
@@ -590,7 +594,7 @@ double achilles::EventGen::GenerateEvent(const std::vector<FourVector> &mom, con
 
                 // update theta and produce theta hist data
                 Theta = event.Momentum().back().Theta();
-                fmt::print("theta = {:^8.5e}\n", Theta);
+                /* fmt::print("theta = {:^8.5e}\n", Theta);
                 try {
                     std::cout << "Writing data to file" << "\n";
                     std::ofstream theta_hist("/Users/sherry/Desktop/Fermilab/theta_hist_1.txt", std::ios_base::app);
@@ -604,7 +608,49 @@ double achilles::EventGen::GenerateEvent(const std::vector<FourVector> &mom, con
                 catch (const char* msg) {
                     std::cerr << msg << "\n";
                 }
-                std::cout << "Done!\n";
+                std::cout << "Done!\n"; */
+
+                // set target theta
+                double Target_theta = 16;
+                double Theta_degrees = (Theta / M_PI) * 180;
+
+                // filter out unwanted theta values
+                if ((Theta_degrees > (Target_theta + 0.1)) || (Theta_degrees < (Target_theta - 0.1))) {
+
+                    // export P_L data for figure 5 (antineutrino)
+                    fmt::print("Polarization_L (k = 0) = {:^8.5e} +/- {:^8.5e}\n", Polarization_l[0].Mean(), Polarization_l[0].Error());
+                    try {
+                        std::cout << "Writing data to file" << "\n";
+                        std::ofstream pl_vs_q_data("/Users/sherry/Desktop/Fermilab/pl_vs_q.txt", std::ios_base::app);
+                        if (pl_vs_q_data.is_open()) {
+                            pl_vs_q_data << Q0 << "\t" << Polarization_l[0].Mean() << "\t" << Polarization_l[0].Error() << "\n";
+                        }
+                        else {
+                            std::cout << "There was a problem opening the file" << "\n";
+                        }
+                    }
+                    catch (const char* msg) {
+                        std::cerr << msg << "\n";
+                    }
+                    std::cout << "Done!\n";
+
+                    // export P_T data for figure 5 (antineutrino)
+                    fmt::print("Polarization_T (k = 0) = {:^8.5e} +/- {:^8.5e}\n", Polarization_t[0].Mean(), Polarization_t[0].Error());
+                    try {
+                        std::cout << "Writing data to file" << "\n";
+                        std::ofstream pt_vs_q_data("/Users/sherry/Desktop/Fermilab/pt_vs_q.txt", std::ios_base::app);
+                        if (pt_vs_q_data.is_open()) {
+                            pt_vs_q_data << Q0 << "\t" << Polarization_t[0].Mean() << "\t" << Polarization_t[0].Error() << "\n";
+                        }
+                        else {
+                            std::cout << "There was a problem opening the file" << "\n";
+                        }
+                    }
+                    catch (const char* msg) {
+                        std::cerr << msg << "\n";
+                    }
+                    std::cout << "Done!\n";
+                }
             }
         }
     }
