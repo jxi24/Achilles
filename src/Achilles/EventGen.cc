@@ -286,10 +286,22 @@ void achilles::EventGen::GenerateEvents() {
                 polarizationL0.Mean(), polarizationL0.Error());
     fmt::print("PolarizationL1 = {:^8.5e} +/- {:^8.5e}\n",
                 polarizationL1.Mean(), polarizationL1.Error());
-    std::ofstream outfilep;
-    outfilep.open("/mnt/c/Users/rusmi/Achilles/polarization.txt", std::ios_base::out | std::ios_base::app); 
-    outfilep << polarizationT0.Mean() << '\n' << polarizationT1.Mean() << '\n'<< polarizationL0.Mean() << '\n' << polarizationL1.Mean() << '\n' << std::endl;
-    outfilep.close();
+    //std::ofstream outfilep;
+    //outfilep.open("/mnt/c/Users/rusmi/Achilles/polarizationL0.txt", std::ios_base::out | std::ios_base::app); 
+    //outfilep << polarizationL0.Mean() << '\n' << std::endl;
+    //outfilep.close();
+    std::ofstream outfilep1;
+    outfilep1.open("/mnt/c/Users/rusmi/Achilles/polarizationL1_mean.txt", std::ios_base::out | std::ios_base::app); 
+    outfilep1 << polarizationL1.Mean() << '\n' << std::endl;
+    outfilep1.close();
+    //std::ofstream outfilep2;
+    //outfilep2.open("/mnt/c/Users/rusmi/Achilles/polarizationT0.txt", std::ios_base::out | std::ios_base::app); 
+    //outfilep2 << polarizationT0.Mean() << '\n' << std::endl;
+    //outfilep2.close();
+    //std::ofstream outfilep3;
+    //outfilep3.open("/mnt/c/Users/rusmi/Achilles/polarizationT1.txt", std::ios_base::out | std::ios_base::app); 
+    //outfilep3 << polarizationT1.Mean() << '\n' << std::endl;
+    //outfilep3.close();
 }
 
 double achilles::EventGen::GenerateEvent(const std::vector<FourVector> &mom, const double &wgt) {
@@ -400,12 +412,20 @@ double achilles::EventGen::GenerateEvent(const std::vector<FourVector> &mom, con
             // creating files with event details, energy out and theta out
             std::ofstream outfileE;
             outfileE.open("/mnt/c/Users/rusmi/Achilles/energy.txt", std::ios_base::out | std::ios_base::app); 
-            outfileE << 6000 - event.Momentum().back().E() << std::endl;
+            outfileE << event.Momentum()[1].E() - event.Momentum().back().E() << std::endl;
             outfileE.close();
             std::ofstream outfileT;
             outfileT.open("/mnt/c/Users/rusmi/Achilles/theta.txt", std::ios_base::out | std::ios_base::app); 
             outfileT << event.Momentum().back().Theta() << std::endl;
             outfileT.close();
+            std::ofstream outfilePL;
+            outfilePL.open("/mnt/c/Users/rusmi/Achilles/polarizationL1.txt", std::ios_base::out | std::ios_base::app); 
+            outfilePL << event.PolarizationL()[1] << std::endl;
+            outfilePL.close();
+            std::ofstream outfilePT;
+            outfilePL.open("/mnt/c/Users/rusmi/Achilles/polarizationT1.txt", std::ios_base::out | std::ios_base::app); 
+            outfilePL << event.PolarizationT()[1] << std::endl;
+            outfilePL.close();
         }
     }
 

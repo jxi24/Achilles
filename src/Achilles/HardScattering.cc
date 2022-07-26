@@ -153,8 +153,10 @@ achilles::Currents LeptonicCurrent::CalcCurrents(const std::vector<FourVector> &
 void HardScattering::SetProcess(const Process_Info &process) {
     spdlog::debug("Adding Process: {}", process);
     m_leptonicProcess = process;
+    #ifndef ENABLE_BSM
     m_current.Initialize(process);
     SMFormFactor = m_current.GetFormFactor();
+    #endif
 }
 
 achilles::Currents HardScattering::LeptonicCurrents(const std::vector<FourVector> &p,
@@ -310,6 +312,9 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
                     pL.resize(hadronCurrent.size());
                     pT.resize(hadronCurrent.size());
                     for(size_t k = 0; k < hadronCurrent.size(); ++k) {
+                        if ( ((mu == 0) && (nu != 0)) || ((mu != 0) && (nu == 0)) ) {
+                            sign = -1;
+                        }
                         if (amps2[1] == 0) {
                             pL[k] = 0;
                             pT[k] = 0;
@@ -317,9 +322,9 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
                         else {
                             double coupl2 = pow(Constant::ee/(Constant::sw*sqrt(2)), 2);
                             double prefact = coupl2/pow(Constant::MW, 4);
-                            pL[k] += prefact * real(((mass_out)*(hL[mu]*lept_in[nu] + lept_in[mu]*hL[nu] - sign*lept_in*hL 
+                            pL[k] += prefact * real((mass_out*(hL[mu]*lept_in[nu] + lept_in[mu]*hL[nu] - sign*lept_in*hL 
                             - LeviCivita(mu,nu,alpha,beta)*hL[alpha]*lept_in[beta]*i)*hadronTensor[{-24,-24}][k][mu][nu]))/(real(wl[k]));
-                            pT[k] += prefact * real(((mass_out)*(hT[mu]*lept_in[nu] + lept_in[mu]*hT[nu] - sign*lept_in*hT 
+                            pT[k] += prefact * real((mass_out*(hT[mu]*lept_in[nu] + lept_in[mu]*hT[nu] - sign*lept_in*hT 
                             + LeviCivita(mu,nu,alpha,beta)*hT[alpha]*lept_in[beta]*i)*hadronTensor[{-24,-24}][k][mu][nu]))/(real(wl[k]));
                         }   
                     }         
@@ -327,6 +332,7 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
             }
         }
     }
+
     event.PolarizationL() = pL;
     event.PolarizationT() = pT; 
 
