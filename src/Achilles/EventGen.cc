@@ -615,15 +615,15 @@ double achilles::EventGen::GenerateEvent(const std::vector<FourVector> &mom, con
                 double Theta_degrees = (Theta / M_PI) * 180;
 
                 // filter out unwanted theta values
-                if ((Theta_degrees > (Target_theta + 0.1)) || (Theta_degrees < (Target_theta - 0.1))) {
+                if ((Theta_degrees > (Target_theta + 0.5)) || (Theta_degrees < (Target_theta - 0.5))) {
 
                     // export P_L data for figure 5 (antineutrino)
-                    fmt::print("Polarization_L (k = 0) = {:^8.5e} +/- {:^8.5e}\n", Polarization_l[0].Mean(), Polarization_l[0].Error());
+                    fmt::print("Polarization_L (k = 0) = {:^8.5e}\n", event.get_polarization_l()[0]);
                     try {
                         std::cout << "Writing data to file" << "\n";
-                        std::ofstream pl_vs_q_data("/Users/sherry/Desktop/Fermilab/pl_vs_q.txt", std::ios_base::app);
+                        std::ofstream pl_vs_q_data("/Users/sherry/Desktop/Fermilab/pl_vs_q_2.txt", std::ios_base::app);
                         if (pl_vs_q_data.is_open()) {
-                            pl_vs_q_data << Q0 << "\t" << Polarization_l[0].Mean() << "\t" << Polarization_l[0].Error() << "\n";
+                            pl_vs_q_data << Q0 << "\t" << event.get_polarization_l()[0] << "\n";
                         }
                         else {
                             std::cout << "There was a problem opening the file" << "\n";
@@ -635,12 +635,12 @@ double achilles::EventGen::GenerateEvent(const std::vector<FourVector> &mom, con
                     std::cout << "Done!\n";
 
                     // export P_T data for figure 5 (antineutrino)
-                    fmt::print("Polarization_T (k = 0) = {:^8.5e} +/- {:^8.5e}\n", Polarization_t[0].Mean(), Polarization_t[0].Error());
+                    fmt::print("Polarization_T (k = 0) = {:^8.5e}\n", event.get_polarization_t()[0]);
                     try {
                         std::cout << "Writing data to file" << "\n";
-                        std::ofstream pt_vs_q_data("/Users/sherry/Desktop/Fermilab/pt_vs_q.txt", std::ios_base::app);
+                        std::ofstream pt_vs_q_data("/Users/sherry/Desktop/Fermilab/pt_vs_q_2.txt", std::ios_base::app);
                         if (pt_vs_q_data.is_open()) {
-                            pt_vs_q_data << Q0 << "\t" << Polarization_t[0].Mean() << "\t" << Polarization_t[0].Error() << "\n";
+                            pt_vs_q_data << Q0 << "\t" << event.get_polarization_t()[0] << "\n";
                         }
                         else {
                             std::cout << "There was a problem opening the file" << "\n";
