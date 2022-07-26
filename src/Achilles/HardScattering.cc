@@ -270,9 +270,6 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
                     for(size_t i = 0; i  < nlep_spins; ++i) {
                         // calculate L^{\mu\nu}
                         leptonTensor[{boson1,boson2}][mu][nu] += (lcurrent1.second[i][mu] * std::conj(lcurrent2.second[i][nu]));
-                        //spdlog::info(leptonTensor[{boson1,boson2}][mu][nu]);
-                        //spdlog::info(hadronTensor[{boson1,boson2}][0][mu][nu]);
-                        //throw;
                     }  
                 } 
             }
@@ -288,7 +285,7 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
             for(size_t mu = 0; mu < 4; ++mu) {
                 for(size_t nu = 0; nu < 4; ++nu) {
                     double sign = 1;
-                    if ( ((mu == 0) && (nu != 0)) || ((mu != 0) && (nu == 0)) ) {
+                    if ( (mu == 0 && nu != 0) || (mu != 0 && nu == 0) ) {
                         sign = -1;
                     }
                     wl[k] += (leptonTensor[bosons][mu][nu] * sign) * hadronTensor[bosons][k][mu][nu];
@@ -302,33 +299,40 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
 
     std::vector<double> pL;
     std::vector<double> pT;
- 
-    double sign = 1;
+    
+    std::complex<double> leviL;
+    std::complex<double> leviT;
+    double sign = 0;
     for(size_t mu = 0; mu < 4; ++mu) {
+        if ( mu == 0) {
+            sign = 1;
+        }
+        else if ( mu != 0) {
+            sign = -1;
+        }
         for(size_t nu = 0; nu < 4; ++nu) {
+            auto hLk = hL[mu]*lept_in[nu] + lept_in[mu]*hL[nu] - sign*lept_in*hL;
+            auto hTk = hT[mu]*lept_in[nu] + lept_in[mu]*hT[nu] - sign*lept_in*hT;
             for(size_t alpha = 0; alpha < 4; ++alpha) {
                 for(size_t beta = 0; beta < 4; ++beta) {
                     std::complex<double> i = {0,1};
+                    leviL = LeviCivita(mu,nu,alpha,beta)*hL[alpha]*lept_in[beta]*i;
+                    leviT = LeviCivita(mu,nu,alpha,beta)*hT[alpha]*lept_in[beta]*i;
                     pL.resize(hadronCurrent.size());
-                    pT.resize(hadronCurrent.size());
-                    for(size_t k = 0; k < hadronCurrent.size(); ++k) {
-                        if ( ((mu == 0) && (nu != 0)) || ((mu != 0) && (nu == 0)) ) {
-                            sign = -1;
-                        }
-                        if (amps2[1] == 0) {
-                            pL[k] = 0;
-                            pT[k] = 0;
-                        }
-                        else {
-                            double coupl2 = pow(Constant::ee/(Constant::sw*sqrt(2)), 2);
-                            double prefact = coupl2/pow(Constant::MW, 4);
-                            pL[k] += prefact * real((mass_out*(hL[mu]*lept_in[nu] + lept_in[mu]*hL[nu] - sign*lept_in*hL 
-                            - LeviCivita(mu,nu,alpha,beta)*hL[alpha]*lept_in[beta]*i)*hadronTensor[{-24,-24}][k][mu][nu]))/(real(wl[k]));
-                            pT[k] += prefact * real((mass_out*(hT[mu]*lept_in[nu] + lept_in[mu]*hT[nu] - sign*lept_in*hT 
-                            + LeviCivita(mu,nu,alpha,beta)*hT[alpha]*lept_in[beta]*i)*hadronTensor[{-24,-24}][k][mu][nu]))/(real(wl[k]));
-                        }   
-                    }         
+                    pT.resize(hadronCurrent.size());         
                 }                   
+            }
+            for(size_t k = 0; k < hadronCurrent.size(); ++k) {
+                if (amps2[1] == 0) {
+                    pL[k] = 0;
+                    pT[k] = 0;
+                }
+                else {
+                    double coupl2 = pow(Constant::ee/(Constant::sw*sqrt(2)), 2);
+                    double prefact = coupl2/pow(Constant::MW, 4);
+                    pL[k] += prefact * real((mass_out*(hLk - leviL)*hadronTensor[{-24,-24}][k][mu][nu]))/(real(wl[k]));
+                    pT[k] += prefact * real((mass_out*(hTk + leviT)*hadronTensor[{-24,-24}][k][mu][nu]))/(real(wl[k]));
+                }   
             }
         }
     }
@@ -337,9 +341,7 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
     event.PolarizationT() = pT; 
 
 
-    //spdlog::info("pL then pT");
-    //spdlog::info(pL[1]);
-    //spdlog::info(pT[1]);
+
     
 
 
