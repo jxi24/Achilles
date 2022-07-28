@@ -568,8 +568,8 @@ double achilles::EventGen::GenerateEvent(const std::vector<FourVector> &mom, con
             // TODO: generalize to hadronCurrent.size()
             for (size_t k = 0; k < 2; ++k) {
                 // update polarization
-                Polarization_l[k] += event.get_polarization_l()[k];
-                Polarization_t[k] += event.get_polarization_t()[k];
+                // Polarization_l[k] += event.get_polarization_l()[k];
+                // Polarization_t[k] += event.get_polarization_t()[k];
 
                 // update amps2[k]
                 Amps2[k] = event.get_amps2()[k];
@@ -617,7 +617,7 @@ double achilles::EventGen::GenerateEvent(const std::vector<FourVector> &mom, con
                 // filter out unwanted theta values
                 if ((Theta_degrees > (Target_theta + 0.5)) || (Theta_degrees < (Target_theta - 0.5))) {
 
-                    // export P_L data for figure 5 (antineutrino)
+                    /* // export P_L data for figure 5 (antineutrino)
                     fmt::print("Polarization_L (k = 0) = {:^8.5e}\n", event.get_polarization_l()[0]);
                     try {
                         std::cout << "Writing data to file" << "\n";
@@ -649,10 +649,27 @@ double achilles::EventGen::GenerateEvent(const std::vector<FourVector> &mom, con
                     catch (const char* msg) {
                         std::cerr << msg << "\n";
                     }
+                    std::cout << "Done!\n"; */
+
+                    // TODO: write q0, theta, the numerator of longitudinal polarization, and the numerator of of transverse polarization out to a file
+                    fmt::print("q0 = {:^8.5e}\n", Q0);
+                    fmt::print("theta = {:^8.5e}\n", Theta_degrees);
+                    fmt::print("Polarization_L Numerator (k = 0) = {:^8.5e}\n", event.get_p_num_l()[0]);
+                    fmt::print("Polarization_T Numerator (k = 0) = {:^8.5e}\n", event.get_p_num_t()[0]);
+                    try {
+                        std::cout << "Writing data to file" << "\n";
+                        std::ofstream data("/Users/sherry/Desktop/Fermilab/etau_theta_pnum_data.txt", std::ios_base::app);
+                        if (data.is_open()) {
+                            data << Q0 << "\t" << Theta_degrees << "\t" << event.get_p_num_l()[0] << "\t" << event.get_p_num_t()[0] << "\n";
+                        }
+                        else {
+                            std::cout << "There was a problem opening the file" << "\n";
+                        }
+                    }
+                    catch (const char* msg) {
+                        std::cerr << msg << "\n";
+                    }
                     std::cout << "Done!\n";
-
-                    // TODO: write Etau or q0, theta, the numerator of longitudinal polarization, and the numerator of of transverse polarization out to a file
-
 
                 }
             }

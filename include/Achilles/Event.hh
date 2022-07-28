@@ -74,13 +74,13 @@ class Event {
         }
 
         // accessor, returns an array of polarization_l for k = 0 and k = 1
-        std::array<double, 2> get_polarization_l();
+        std::array<double, 2> get_p_num_l();
         // accessor, returns an array of polarization_t for k = 0 and k = 1
-        std::array<double, 2> get_polarization_t();
+        std::array<double, 2> get_p_num_t();
         // mutator, modifies an array of polarization_l for k = 0 and k = 1
-        void set_polarization_l(std::array<double, 2> new_polarization);
+        void set_p_num_l(std::array<double, 2> new_polarization);
         // mutator, modifies an array of polarization_l for k = 0 and k = 1
-        void set_polarization_t(std::array<double, 2> new_polarization);
+        void set_p_num_t(std::array<double, 2> new_polarization);
         // accessor, returns amps2[k]
         std::array<double, 2> get_amps2();
         // mutator, defines amps2[k]
@@ -100,8 +100,8 @@ class Event {
         vParticles m_leptons{};
         vParticles m_history{};
         // arrays keeping track of p_l and p_t for k = 0 and k = 1
-        std::array<double, 2> m_polarization_l{};
-        std::array<double, 2> m_polarization_t{};
+        std::array<double, 2> m_p_num_l{};
+        std::array<double, 2> m_p_num_t{};
         // array keeping track of amps2[k]
         std::array<double, 2> m_amps2{};
         // double keeping track of q^0

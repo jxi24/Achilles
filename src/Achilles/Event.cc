@@ -125,20 +125,20 @@ void Event::Rotate(const std::array<double,9>& rot_mat) {
     for (auto& particle: m_leptons){ particle.Rotate(rot_mat); }
 }
 
-std::array<double, 2> Event::get_polarization_l() {
-    return m_polarization_l;
+std::array<double, 2> Event::get_p_num_l() {
+    return m_p_num_l;
 }
 
-std::array<double, 2> Event::get_polarization_t() {
-    return m_polarization_t;
+std::array<double, 2> Event::get_p_num_t() {
+    return m_p_num_t;
 }
 
-void Event::set_polarization_l(std::array<double, 2> new_polarization) {
-    m_polarization_l = new_polarization;
+void Event::set_p_num_l(std::array<double, 2> new_polarization) {
+    m_p_num_l = new_polarization;
 }
 
-void Event::set_polarization_t(std::array<double, 2> new_polarization) {
-    m_polarization_t = new_polarization;
+void Event::set_p_num_t(std::array<double, 2> new_polarization) {
+    m_p_num_t = new_polarization;
 }
 
 std::array<double, 2> Event::get_amps2() {

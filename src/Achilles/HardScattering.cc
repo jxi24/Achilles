@@ -528,10 +528,10 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
     } */
 
     // calculate, print + check final polarization vector
-    std::vector<std::array<std::complex<double>,2>> p(hadronCurrent.size());
+    // std::vector<std::array<std::complex<double>,2>> p(hadronCurrent.size());
     // spdlog::info("{}", "Results:");
     // loop over polarization
-    for(size_t i = 0; i < 2; ++i) {
+    /* for(size_t i = 0; i < 2; ++i) {
         for(size_t k = 0; k < hadronCurrent.size(); ++k) {
             if ( (amps2[k] != 0) && (amps2[k] == amps2[k]) ) {
                 p[i][k] = p_num[i][k] / amps2[k];
@@ -550,7 +550,7 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
                 // throw;
             }
         }  
-    } 
+    } */
 
     // print + check final polarization vector
     // p_l
@@ -564,10 +564,6 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
     spdlog::info("{}", "p[1][1]=");
     spdlog::info("{}", p[1][1]);
     throw; */
-
-    // connect final polarization vector to event code
-    event.set_polarization_l({p[0][0].real(), p[0][1].real()});
-    event.set_polarization_t({p[1][0].real(), p[1][1].real()});
 
     // send amps2[k] info to event gen
     event.set_amps2( {amps2[0], amps2[1]} );
@@ -588,6 +584,10 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
         xsecs[i] = amps2[i]*Constant::HBARC2/spin_avg/flux*to_nb;
         spdlog::debug("Xsec[{}] = {}", i, xsecs[i]);
     }
+
+    // connect polarization numerator to event code
+    event.set_p_num_l({Constant::HBARC2/spin_avg/flux*to_nb * p_num[0][0].real(), Constant::HBARC2/spin_avg/flux*to_nb * p_num[0][1].real()});
+    event.set_p_num_t({Constant::HBARC2/spin_avg/flux*to_nb * p_num[1][0].real(), Constant::HBARC2/spin_avg/flux*to_nb * p_num[1][1].real()});
 
     return xsecs;
 }
