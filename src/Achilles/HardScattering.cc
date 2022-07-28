@@ -363,19 +363,22 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
                     contraction[k] += mult * leptonTensor[bosons][mu][nu] * hadronTensor[bosons][k][mu][nu];
                 }
             }
-            // print + check if contractions match amps2[k]
-            /* spdlog::info("{}", k);
-            spdlog::info("{}", amps2[k]);
-            spdlog::info("{}", contraction[k]); */
         }
     }
 
+    // print + check if contractions match amps2[k]
+    /* if ( (amps2[0] != 0) && (amps2[0] == amps2[0]) ) {
+        // spdlog::info("{}", k);
+        spdlog::info("{}", amps2[0]);
+        spdlog::info("{}", contraction[0]);
+    } */
+
     // print + check amps2[k] if valid
-    /* if ( (amps2[1] != 0) && (amps2[1] == amps2[1]) ) {
+    /* if ( (amps2[0] != 0) && (amps2[0] == amps2[0]) ) {
         spdlog::info("{}", "Denominator:");
-        spdlog::info("{}", amps2[1]);
-    }
-    throw; */
+        spdlog::info("{}", amps2[0]);
+    } */
+    // throw;
 
     // contractions and amps2[k] now agree!
 
@@ -405,6 +408,14 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
         // calculate gkh_t
         gkh[1][mu][mu] = g * lept_in * ht;
     }
+
+    // check other values of gkh initiated to zero
+    /* for(size_t mu = 0; mu < 4; ++mu) {
+        for (size_t nu = 0; nu < 4; ++nu) {
+            spdlog::info("{}", gkh[0][mu][nu]);
+        }
+    }
+    throw; */
 
     // calculate iehk
     std::vector<std::array<std::array<std::complex<double>,4>,4>> iehk(2);
@@ -459,7 +470,7 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
                 spdlog::info("{}", hadronTensor[{-24, -24}][k][mu][nu]); */
                 if ( (amps2[k] != 0) && (amps2[k] == amps2[k]) ) {
                     p_num[0][k] += mult * prefact * mass_out * (hkkh[0][mu][nu] - gkh[0][mu][nu] + iehk[0][mu][nu]) * hadronTensor[{24, 24}][k][mu][nu];
-                    p_num[1][k] += mult* prefact * mass_out * (hkkh[1][mu][nu] - gkh[1][mu][nu] - iehk[1][mu][nu]) * hadronTensor[{24, 24}][k][mu][nu];
+                    p_num[1][k] += mult * prefact * mass_out * (hkkh[1][mu][nu] - gkh[1][mu][nu] - iehk[1][mu][nu]) * hadronTensor[{24, 24}][k][mu][nu];
                 }
                 else {
                     p_num[0][k] = 0;
@@ -524,10 +535,17 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
         for(size_t k = 0; k < hadronCurrent.size(); ++k) {
             if ( (amps2[k] != 0) && (amps2[k] == amps2[k]) ) {
                 p[i][k] = p_num[i][k] / amps2[k];
-                //spdlog::info("{}", "amps2[k] is valid");
+                // spdlog::info("{}", p[i][k]);
+                // spdlog::info("{}", "amps2[k] is valid");
+            }
+            else if (amps2[k] != amps2[k]) {
+                p[i][k] = 0;
+                // spdlog::info("{}", "amps2[k] is nan");
+                // throw;
             }
             else {
                 p[i][k] = 0;
+                // spdlog::info("{}", p[i][k]);
                 // spdlog::info("{}", "amps2[k] is nan");
                 // throw;
             }

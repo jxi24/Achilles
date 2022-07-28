@@ -611,7 +611,7 @@ double achilles::EventGen::GenerateEvent(const std::vector<FourVector> &mom, con
                 std::cout << "Done!\n"; */
 
                 // set target theta
-                double Target_theta = 16;
+                double Target_theta = 4;
                 double Theta_degrees = (Theta / M_PI) * 180;
 
                 // filter out unwanted theta values
@@ -621,7 +621,7 @@ double achilles::EventGen::GenerateEvent(const std::vector<FourVector> &mom, con
                     fmt::print("Polarization_L (k = 0) = {:^8.5e}\n", event.get_polarization_l()[0]);
                     try {
                         std::cout << "Writing data to file" << "\n";
-                        std::ofstream pl_vs_q_data("/Users/sherry/Desktop/Fermilab/pl_vs_q_2.txt", std::ios_base::app);
+                        std::ofstream pl_vs_q_data("/Users/sherry/Desktop/Fermilab/pl_vs_q_4.txt", std::ios_base::app);
                         if (pl_vs_q_data.is_open()) {
                             pl_vs_q_data << Q0 << "\t" << event.get_polarization_l()[0] << "\n";
                         }
@@ -638,7 +638,7 @@ double achilles::EventGen::GenerateEvent(const std::vector<FourVector> &mom, con
                     fmt::print("Polarization_T (k = 0) = {:^8.5e}\n", event.get_polarization_t()[0]);
                     try {
                         std::cout << "Writing data to file" << "\n";
-                        std::ofstream pt_vs_q_data("/Users/sherry/Desktop/Fermilab/pt_vs_q_2.txt", std::ios_base::app);
+                        std::ofstream pt_vs_q_data("/Users/sherry/Desktop/Fermilab/pt_vs_q_4.txt", std::ios_base::app);
                         if (pt_vs_q_data.is_open()) {
                             pt_vs_q_data << Q0 << "\t" << event.get_polarization_t()[0] << "\n";
                         }
@@ -650,6 +650,10 @@ double achilles::EventGen::GenerateEvent(const std::vector<FourVector> &mom, con
                         std::cerr << msg << "\n";
                     }
                     std::cout << "Done!\n";
+
+                    // TODO: write Etau or q0, theta, the numerator of longitudinal polarization, and the numerator of of transverse polarization out to a file
+
+
                 }
             }
         }
