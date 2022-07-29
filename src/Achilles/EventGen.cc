@@ -292,7 +292,7 @@ void achilles::EventGen::GenerateEvents() {
     //outfilep.close();
     std::ofstream outfilep1;
     outfilep1.open("/mnt/c/Users/rusmi/Achilles/polarizationL1_mean.txt", std::ios_base::out | std::ios_base::app); 
-    outfilep1 << polarizationL1.Mean() << '\n' << std::endl;
+    outfilep1 << polarizationL1.Mean() << std::endl;
     outfilep1.close();
     //std::ofstream outfilep2;
     //outfilep2.open("/mnt/c/Users/rusmi/Achilles/polarizationT0.txt", std::ios_base::out | std::ios_base::app); 
@@ -410,22 +410,13 @@ double achilles::EventGen::GenerateEvent(const std::vector<FourVector> &mom, con
             polarizationT0 += event.PolarizationT()[0];
             polarizationT1 += event.PolarizationT()[1];
             // creating files with event details, energy out and theta out
-            std::ofstream outfileE;
-            outfileE.open("/mnt/c/Users/rusmi/Achilles/energy.txt", std::ios_base::out | std::ios_base::app); 
-            outfileE << event.Momentum()[1].E() - event.Momentum().back().E() << std::endl;
-            outfileE.close();
-            std::ofstream outfileT;
-            outfileT.open("/mnt/c/Users/rusmi/Achilles/theta.txt", std::ios_base::out | std::ios_base::app); 
-            outfileT << event.Momentum().back().Theta() << std::endl;
-            outfileT.close();
-            std::ofstream outfilePL;
-            outfilePL.open("/mnt/c/Users/rusmi/Achilles/polarizationL1.txt", std::ios_base::out | std::ios_base::app); 
-            outfilePL << event.PolarizationL()[1] << std::endl;
-            outfilePL.close();
-            std::ofstream outfilePT;
-            outfilePL.open("/mnt/c/Users/rusmi/Achilles/polarizationT1.txt", std::ios_base::out | std::ios_base::app); 
-            outfilePL << event.PolarizationT()[1] << std::endl;
-            outfilePL.close();
+            std::ofstream outfile;
+            std::string filename = fmt::format("events_{}.txt", config["Beams"][0]["Beam"]["Beam Params"]["Energy"].as<double>());
+            filename = "/mnt/c/Users/rusmi/Achilles/" + filename;
+            outfile.open(filename, std::ios_base::out | std::ios_base::app);
+            outfile << event.Momentum().back().Theta() << "," << event.Momentum().back().E() << "," 
+            << event.PolarizationL()[1] * wgt << ","  << event.PolarizationT()[1] * wgt << "," << event.Weight()  << std::endl;
+            outfile.close();
         }
     }
 

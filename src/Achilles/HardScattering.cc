@@ -299,9 +299,22 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
 
     std::vector<double> pL;
     std::vector<double> pT;
+    pL.resize(hadronCurrent.size());
+    pT.resize(hadronCurrent.size());
     
     std::complex<double> leviL;
     std::complex<double> leviT;
+    std::complex<double> hLk;
+    std::complex<double> hTk;
+    std::complex<double> gkL;
+    std::complex<double> gkT;
+
+    double spin_avg = 1;
+    double mass = ParticleInfo(m_leptonicProcess.m_states.begin()->first[0]).Mass();
+    double flux = 2*event.Momentum()[1].E()*2*sqrt(event.Momentum()[0].P2() + mass*mass);
+    static constexpr double to_nb = 1e6;
+    double constant = 6 * (Constant::HBARC2/spin_avg/flux*to_nb);
+
     double sign = 0;
     for(size_t mu = 0; mu < 4; ++mu) {
         if ( mu == 0) {
@@ -310,51 +323,42 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
         else if ( mu != 0) {
             sign = -1;
         }
+        gkL = - sign*lept_in*hL;
+        gkT = - sign*lept_in*hT;
         for(size_t nu = 0; nu < 4; ++nu) {
-            auto hLk = hL[mu]*lept_in[nu] + lept_in[mu]*hL[nu] - sign*lept_in*hL;
-            auto hTk = hT[mu]*lept_in[nu] + lept_in[mu]*hT[nu] - sign*lept_in*hT;
+            hLk = hL[mu]*lept_in[nu] + lept_in[mu]*hL[nu];
+            hTk = hT[mu]*lept_in[nu] + lept_in[mu]*hT[nu];
             for(size_t alpha = 0; alpha < 4; ++alpha) {
                 for(size_t beta = 0; beta < 4; ++beta) {
                     std::complex<double> i = {0,1};
                     leviL = LeviCivita(mu,nu,alpha,beta)*hL[alpha]*lept_in[beta]*i;
-                    leviT = LeviCivita(mu,nu,alpha,beta)*hT[alpha]*lept_in[beta]*i;
-                    pL.resize(hadronCurrent.size());
-                    pT.resize(hadronCurrent.size());         
+                    leviT = LeviCivita(mu,nu,alpha,beta)*hT[alpha]*lept_in[beta]*i;        
                 }                   
-            }
+            } 
             for(size_t k = 0; k < hadronCurrent.size(); ++k) {
-                if (amps2[1] == 0) {
+                if ((amps2[k] != 0) && (amps2[k] == amps2[k])) {
+                    double coupl2 = pow(Constant::ee/(Constant::sw*sqrt(2)), 2);
+                    double prefact = coupl2/pow(Constant::MW, 4);
+                    pL[k] += prefact * constant * real((mass_out*(hLk + gkL - leviL)*hadronTensor[{-24,-24}][k][mu][nu]));
+                    pT[k] += prefact * constant * real((mass_out*(hTk + gkT + leviT)*hadronTensor[{-24,-24}][k][mu][nu]));
+                }   
+                else if (amps2[k] == 0) {
                     pL[k] = 0;
                     pT[k] = 0;
                 }
-                else {
-                    double coupl2 = pow(Constant::ee/(Constant::sw*sqrt(2)), 2);
-                    double prefact = coupl2/pow(Constant::MW, 4);
-                    pL[k] += prefact * real((mass_out*(hLk - leviL)*hadronTensor[{-24,-24}][k][mu][nu]))/(real(wl[k]));
-                    pT[k] += prefact * real((mass_out*(hTk + leviT)*hadronTensor[{-24,-24}][k][mu][nu]))/(real(wl[k]));
-                }   
             }
         }
     }
-
+    
     event.PolarizationL() = pL;
     event.PolarizationT() = pT; 
 
-
-
-    
-
-
-    double spin_avg = 1;
     if(!ParticleInfo(m_leptonicProcess.m_ids[0]).IsNeutrino()) spin_avg *= 2;
     if(m_nuclear -> NSpins() > 1) spin_avg *= 2;
 
     // TODO: Correct this flux
     // double flux = 4*sqrt(pow(event.Momentum()[0]*event.Momentum()[1], 2) 
     //                      - event.Momentum()[0].M2()*event.Momentum()[1].M2());
-    double mass = ParticleInfo(m_leptonicProcess.m_states.begin()->first[0]).Mass();
-    double flux = 2*event.Momentum()[1].E()*2*sqrt(event.Momentum()[0].P2() + mass*mass);
-    static constexpr double to_nb = 1e6;
     std::vector<double> xsecs(hadronCurrent.size());
     for(size_t i = 0; i < hadronCurrent.size(); ++i) {
         xsecs[i] = amps2[i]*Constant::HBARC2/spin_avg/flux*to_nb;
