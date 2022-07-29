@@ -415,7 +415,7 @@ double achilles::EventGen::GenerateEvent(const std::vector<FourVector> &mom, con
             filename = "/mnt/c/Users/rusmi/Achilles/" + filename;
             outfile.open(filename, std::ios_base::out | std::ios_base::app);
             outfile << event.Momentum().back().Theta() << "," << event.Momentum().back().E() << "," 
-            << event.PolarizationL()[1] * wgt << ","  << event.PolarizationT()[1] * wgt << "," << event.Weight()  << std::endl;
+            << event.PolarizationL()[1] * wgt * 6 << ","  << event.PolarizationT()[1] * wgt * 6 << "," << event.Weight()  << std::endl;
             outfile.close();
         }
     }
