@@ -611,11 +611,11 @@ double achilles::EventGen::GenerateEvent(const std::vector<FourVector> &mom, con
                 std::cout << "Done!\n"; */
 
                 // set target theta
-                double Target_theta = 16;
+                double Target_theta = 2;
                 double Theta_degrees = (Theta / M_PI) * 180;
 
                 // filter out unwanted theta values
-                if ((Theta_degrees > (Target_theta + 1)) || (Theta_degrees < (Target_theta - 1))) {
+                // if ((Theta_degrees > (Target_theta + 1)) || (Theta_degrees < (Target_theta - 1))) {
 
                     /* // export P_L data for figure 5 (antineutrino)
                     fmt::print("Polarization_L (k = 0) = {:^8.5e}\n", event.get_polarization_l()[0]);
@@ -651,32 +651,32 @@ double achilles::EventGen::GenerateEvent(const std::vector<FourVector> &mom, con
                     }
                     std::cout << "Done!\n"; */
 
-                    // TODO: write q0, theta, the numerator of longitudinal polarization, and the numerator of of transverse polarization out to a file
-                    fmt::print("q0 = {:^8.5e}\n", Q0);
-                    fmt::print("theta = {:^8.5e}\n", Theta_degrees);
-                    fmt::print("Event weight = {:^8.5e}\n", event.Weight());
-                    fmt::print("Polarization_L Numerator (k = 0) = {:^8.5e}\n", event.get_p_num_l()[0]);
-                    fmt::print("Polarization_T Numerator (k = 0) = {:^8.5e}\n", event.get_p_num_t()[0]);
-                    try {
-                        std::cout << "Writing data to file" << "\n";
-                        std::ofstream data("/Users/sherry/Desktop/Fermilab/q0_theta_pnum.txt", std::ios_base::app);
-                        if (data.is_open()) {
-                            data << Q0 << "\t" << Theta_degrees << "\t" << event.Weight() << "\t" << event.get_p_num_l()[0] * 6 * wgt << "\t" 
-                            << event.get_p_num_t()[0] * 6 * wgt << "\n";
-                        }
-                        else {
-                            std::cout << "There was a problem opening the file" << "\n";
-                        }
+                // TODO: write q0, theta, the numerator of longitudinal polarization, and the numerator of of transverse polarization out to a file
+                fmt::print("q0 = {:^8.5e}\n", Q0);
+                fmt::print("theta = {:^8.5e}\n", Theta_degrees);
+                fmt::print("Event weight = {:^8.5e}\n", event.Weight());
+                fmt::print("Polarization_L Numerator (k = 0) = {:^8.5e}\n", event.get_p_num_l()[1]);
+                fmt::print("Polarization_T Numerator (k = 0) = {:^8.5e}\n", event.get_p_num_t()[1]);
+                try {
+                    std::cout << "Writing data to file" << "\n";
+                    std::ofstream data("/Users/sherry/Desktop/Fermilab/q0_theta_pnum.txt", std::ios_base::app);
+                    if (data.is_open()) {
+                        data << Q0 << "\t" << Theta_degrees << "\t" << event.Weight() << "\t" << event.get_p_num_l()[1] * 6 * wgt << "\t" 
+                        << event.get_p_num_t()[1] * 6 * wgt << "\n";
                     }
-                    catch (const char* msg) {
-                        std::cerr << msg << "\n";
+                    else {
+                        std::cout << "There was a problem opening the file" << "\n";
                     }
-                    std::cout << "Done!\n";
-
-                    // update cross section
-                    Total_xsec += event.Weight() / 100000;
-                    
                 }
+                catch (const char* msg) {
+                    std::cerr << msg << "\n";
+                }
+                std::cout << "Done!\n";
+
+                // update cross section
+                Total_xsec += event.Weight() / 100000;
+                    
+                // }
                 
             }
         }
