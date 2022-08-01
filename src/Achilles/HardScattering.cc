@@ -237,11 +237,12 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
     throw; */
 
     // h_T calculation
-    auto ht_vec = direction_out.Cross(direction_out.Cross(direction_in));
+    // auto ht_vec = direction_out.Cross(direction_out.Cross(direction_in));
+    auto ht_vec = (((lept_in.Vec3()).Cross(lept_out.Vec3())).Cross(lept_out.Vec3())).Unit();
     auto ht = FourVector(ht_vec, 0);
 
     // h_L calculation
-    auto hl_vec = energy_in * direction_out;
+    auto hl_vec = energy_out * direction_out;
     auto hl = FourVector(hl_vec, mom_out) / mass_out;
 
     auto hadronCurrent = m_nuclear -> CalcCurrents(event, ffInfo);
@@ -448,6 +449,11 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
     // calculate prefactor and coupling
     double coupl2 = pow(Constant::ee/(Constant::sw*sqrt(2)), 2);
     double prefact = coupl2/pow(Constant::MW, 4);
+    // 24
+    // -24
+    // TODO: CHANGE FOR CASE OF ANTI PARTICLE
+    double mult1 = -1;
+    double mult2 = 1;
 
     for(size_t mu = 0; mu < 4; ++mu) {
         for(size_t nu = 0; nu < 4; ++nu) {
@@ -469,8 +475,8 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
                 spdlog::info("{}", iehk[1][mu][nu]);
                 spdlog::info("{}", hadronTensor[{-24, -24}][k][mu][nu]); */
                 if ( (amps2[k] != 0) && (amps2[k] == amps2[k]) ) {
-                    p_num[0][k] += mult * prefact * mass_out * (hkkh[0][mu][nu] - gkh[0][mu][nu] + iehk[0][mu][nu]) * hadronTensor[{-24, -24}][k][mu][nu];
-                    p_num[1][k] += mult * prefact * mass_out * (hkkh[1][mu][nu] - gkh[1][mu][nu] - iehk[1][mu][nu]) * hadronTensor[{-24, -24}][k][mu][nu];
+                    p_num[0][k] += mult * prefact * mult1 * mass_out * (hkkh[0][mu][nu] - gkh[0][mu][nu] + mult2 * iehk[0][mu][nu]) * hadronTensor[{-24, -24}][k][mu][nu];
+                    p_num[1][k] += mult * prefact * mult1 * mass_out * (hkkh[1][mu][nu] - gkh[1][mu][nu] + mult2 * iehk[1][mu][nu]) * hadronTensor[{-24, -24}][k][mu][nu];
                 }
                 else {
                     p_num[0][k] = 0;
