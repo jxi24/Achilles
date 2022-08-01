@@ -368,10 +368,10 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
     }
 
     // print + check if contractions match amps2[k]
-    /* if ( (amps2[0] != 0) && (amps2[0] == amps2[0]) ) {
+    /* if ( (amps2[1] != 0) && (amps2[1] == amps2[1]) ) {
         // spdlog::info("{}", k);
-        spdlog::info("{}", amps2[0]);
-        spdlog::info("{}", contraction[0]);
+        spdlog::info("{}", amps2[1]);
+        spdlog::info("{}", contraction[1]);
     } */
 
     // print + check amps2[k] if valid
@@ -386,7 +386,7 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
     // Equation 20 calculatios
     // Contract W^{\mu\nu} with L_{\mu\nu} => Numerator of P_(L,T)
 
-    // calculate hk
+    // calculate hkkh
     std::vector<std::array<std::array<std::complex<double>,4>,4>> hkkh(2);
     for(size_t mu = 0; mu < 4; ++mu) {
         for(size_t nu = 0; nu < 4; ++nu) {

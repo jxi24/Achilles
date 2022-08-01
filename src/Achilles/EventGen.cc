@@ -573,99 +573,57 @@ double achilles::EventGen::GenerateEvent(const std::vector<FourVector> &mom, con
 
                 // update amps2[k]
                 Amps2[k] = event.get_amps2()[k];
+            }
+            // update q_0 and produce q_0 hist data
+            Q0 = event.Momentum()[1].E() - event.Momentum().back().E();
+            /* fmt::print("q_0 = {:^8.5e}\n", Q0);
+            try {
+                std::cout << "Writing data to file" << "\n";
+                std::ofstream q_hist("/Users/sherry/Desktop/Fermilab/q_hist_2.txt", std::ios_base::app);
+                if (q_hist.is_open()) {
+                    q_hist << Q0 << "\n";
+                }
+                else {
+                    std::cout << "There was a problem opening the file" << "\n";
+                }
+            }
+            catch (const char* msg) {
+                std::cerr << msg << "\n";
+            }
+            std::cout << "Done!\n"; */
 
-                // update q_0 and produce q_0 hist data
-                Q0 = event.Momentum()[1].E() - event.Momentum().back().E();
-                /* fmt::print("q_0 = {:^8.5e}\n", Q0);
+            // update theta and produce theta hist data
+            Theta = event.Momentum().back().Theta();
+            /* fmt::print("theta = {:^8.5e}\n", Theta);
+            try {
+                std::cout << "Writing data to file" << "\n";
+                std::ofstream theta_hist("/Users/sherry/Desktop/Fermilab/theta_hist_1.txt", std::ios_base::app);
+                if (theta_hist.is_open()) {
+                    theta_hist << Theta << "\n";
+                }
+                else {
+                    std::cout << "There was a problem opening the file" << "\n";
+                }
+            }
+            catch (const char* msg) {
+                std::cerr << msg << "\n";
+            }
+            std::cout << "Done!\n"; */
+
+            // set target theta
+            // double Target_theta = 2;
+            double Theta_degrees = (Theta / M_PI) * 180;
+
+            // filter out unwanted theta values
+            // if ((Theta_degrees > (Target_theta + 1)) || (Theta_degrees < (Target_theta - 1))) {
+
+                /* // export P_L data for figure 5 (antineutrino)
+                fmt::print("Polarization_L (k = 0) = {:^8.5e}\n", event.get_polarization_l()[0]);
                 try {
                     std::cout << "Writing data to file" << "\n";
-                    std::ofstream q_hist("/Users/sherry/Desktop/Fermilab/q_hist_2.txt", std::ios_base::app);
-                    if (q_hist.is_open()) {
-                        q_hist << Q0 << "\n";
-                    }
-                    else {
-                        std::cout << "There was a problem opening the file" << "\n";
-                    }
-                }
-                catch (const char* msg) {
-                    std::cerr << msg << "\n";
-                }
-                std::cout << "Done!\n"; */
-
-                // update theta and produce theta hist data
-                Theta = event.Momentum().back().Theta();
-                /* fmt::print("theta = {:^8.5e}\n", Theta);
-                try {
-                    std::cout << "Writing data to file" << "\n";
-                    std::ofstream theta_hist("/Users/sherry/Desktop/Fermilab/theta_hist_1.txt", std::ios_base::app);
-                    if (theta_hist.is_open()) {
-                        theta_hist << Theta << "\n";
-                    }
-                    else {
-                        std::cout << "There was a problem opening the file" << "\n";
-                    }
-                }
-                catch (const char* msg) {
-                    std::cerr << msg << "\n";
-                }
-                std::cout << "Done!\n"; */
-
-                // set target theta
-                double Target_theta = 2;
-                double Theta_degrees = (Theta / M_PI) * 180;
-
-                // filter out unwanted theta values
-                // if ((Theta_degrees > (Target_theta + 1)) || (Theta_degrees < (Target_theta - 1))) {
-
-                    /* // export P_L data for figure 5 (antineutrino)
-                    fmt::print("Polarization_L (k = 0) = {:^8.5e}\n", event.get_polarization_l()[0]);
-                    try {
-                        std::cout << "Writing data to file" << "\n";
-                        std::ofstream pl_vs_q_data("/Users/sherry/Desktop/Fermilab/pl_vs_q_4.txt", std::ios_base::app);
-                        if (pl_vs_q_data.is_open()) {
-                            pl_vs_q_data << Q0 << "\t" << event.get_polarization_l()[0] << "\n";
-                        }
-                        else {
-                            std::cout << "There was a problem opening the file" << "\n";
-                        }
-                    }
-                    catch (const char* msg) {
-                        std::cerr << msg << "\n";
-                    }
-                    std::cout << "Done!\n";
-
-                    // export P_T data for figure 5 (antineutrino)
-                    fmt::print("Polarization_T (k = 0) = {:^8.5e}\n", event.get_polarization_t()[0]);
-                    try {
-                        std::cout << "Writing data to file" << "\n";
-                        std::ofstream pt_vs_q_data("/Users/sherry/Desktop/Fermilab/pt_vs_q_4.txt", std::ios_base::app);
-                        if (pt_vs_q_data.is_open()) {
-                            pt_vs_q_data << Q0 << "\t" << event.get_polarization_t()[0] << "\n";
-                        }
-                        else {
-                            std::cout << "There was a problem opening the file" << "\n";
-                        }
-                    }
-                    catch (const char* msg) {
-                        std::cerr << msg << "\n";
-                    }
-                    std::cout << "Done!\n"; */
-
-                // TODO: write q0, theta, the numerator of longitudinal polarization, and the numerator of of transverse polarization out to a file
-                fmt::print("q0 = {:^8.5e}\n", Q0);
-                fmt::print("theta = {:^8.5e}\n", Theta_degrees);
-                fmt::print("Event weight = {:^8.5e}\n", event.Weight());
-                fmt::print("Polarization_L Numerator (k = 1) = {:^8.5e}\n", event.get_p_num_l()[1]);
-                fmt::print("Polarization_T Numerator (k = 1) = {:^8.5e}\n", event.get_p_num_t()[1]);
-                try {
-                    std::cout << "Writing data to file" << "\n";
-                    std::ofstream data("/Users/sherry/Desktop/Fermilab/q0_theta_pnum.txt", std::ios_base::app);
-                    if (data.is_open() && Amps2[1] == Amps2[1]) {
-                        data << Q0 << "\t" << Theta_degrees << "\t" << event.Weight() << "\t" << event.get_p_num_l()[1] * 6 * wgt << "\t" 
-                        << event.get_p_num_t()[1] * 6 * wgt << "\n";
-                    }
-                    else if (Amps2[1] != Amps2[1]) {
-                        std::cout << "Amps2[k] is invalid" << "\n";
+                    std::ofstream pl_vs_q_data("/Users/sherry/Desktop/Fermilab/pl_vs_q_4.txt", std::ios_base::app);
+                    if (pl_vs_q_data.is_open()) {
+                        pl_vs_q_data << Q0 << "\t" << event.get_polarization_l()[0] << "\n";
                     }
                     else {
                         std::cout << "There was a problem opening the file" << "\n";
@@ -676,13 +634,55 @@ double achilles::EventGen::GenerateEvent(const std::vector<FourVector> &mom, con
                 }
                 std::cout << "Done!\n";
 
-                // update cross section
-                Total_xsec += event.Weight() / 100000;
-                    
-                // }
-                
+                // export P_T data for figure 5 (antineutrino)
+                fmt::print("Polarization_T (k = 0) = {:^8.5e}\n", event.get_polarization_t()[0]);
+                try {
+                    std::cout << "Writing data to file" << "\n";
+                    std::ofstream pt_vs_q_data("/Users/sherry/Desktop/Fermilab/pt_vs_q_4.txt", std::ios_base::app);
+                    if (pt_vs_q_data.is_open()) {
+                        pt_vs_q_data << Q0 << "\t" << event.get_polarization_t()[0] << "\n";
+                    }
+                    else {
+                        std::cout << "There was a problem opening the file" << "\n";
+                    }
+                }
+                catch (const char* msg) {
+                    std::cerr << msg << "\n";
+                }
+                std::cout << "Done!\n"; */
+
+            // TODO: write q0, theta, the numerator of longitudinal polarization, and the numerator of of transverse polarization out to a file
+            fmt::print("q0 = {:^8.5e}\n", Q0);
+            fmt::print("theta = {:^8.5e}\n", Theta_degrees);
+            fmt::print("Event weight = {:^8.5e}\n", event.Weight());
+            fmt::print("Polarization_L Numerator (k = 1) = {:^8.5e}\n", event.get_p_num_l()[1]);
+            fmt::print("Polarization_T Numerator (k = 1) = {:^8.5e}\n", event.get_p_num_t()[1]);
+            try {
+                std::cout << "Writing data to file" << "\n";
+                std::ofstream data("/Users/sherry/Desktop/Fermilab/q0_theta_pnum.txt", std::ios_base::app);
+                if (data.is_open() && Amps2[1] == Amps2[1]) {
+                    data << Q0 << "\t" << Theta_degrees << "\t" << event.Weight() << "\t" << event.get_p_num_l()[1] * 6 * wgt << "\t" 
+                    << event.get_p_num_t()[1] * 6 * wgt << "\n";
+                }
+                else if (Amps2[1] != Amps2[1]) {
+                    std::cout << "Amps2[k] is invalid" << "\n";
+                }
+                else {
+                    std::cout << "There was a problem opening the file" << "\n";
+                }
             }
+            catch (const char* msg) {
+                std::cerr << msg << "\n";
+            }
+            std::cout << "Done!\n";
+
+            // update cross section
+            // Total_xsec += event.Weight() / 100000;
+                
+            // }
+            
         }
+    
     }
 
     // Always return the weight when the event passes the initial hard cut.
