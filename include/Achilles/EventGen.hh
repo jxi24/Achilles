@@ -68,7 +68,7 @@ class EventGen {
         // double keeping track of theta
         double Theta;
         // double keeping track of total cross section
-        double Total_xsec = 0;
+        // double Total_xsec = 0;
 };
 
 }

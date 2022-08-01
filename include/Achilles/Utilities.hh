@@ -67,7 +67,7 @@ void tokenize(const std::string& str, ContainerT& tokens,
 }
 
 constexpr int LeviCivita(const int i, const int j, const int k, const int l) {
-    return (i==j||i==k||i==l||j==k||j==l||k==l) ? 0 : -(i-j)*(i-k)*(i-l)*(j-k)*(j-l)*(k-l)/12;
+    return (i==j||i==k||i==l||j==k||j==l||k==l) ? 0 : (i-j)*(i-k)*(i-l)*(j-k)*(j-l)*(k-l)/12;
 }
 
 class FourVector;
