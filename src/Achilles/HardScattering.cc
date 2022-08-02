@@ -244,13 +244,15 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
     auto lept_in = event.Momentum()[1];
     auto lept_out = event.Momentum().back();
     auto energy_in = lept_in.E();
+    auto energy_out = lept_out.E();
     auto mass_out = lept_out.M();
     // auto mom_in = lept_in.Vec3().Magnitude();
     auto direction_in = lept_in.Vec3().Unit();
     auto direction_out = lept_out.Vec3().Unit();
 
-    auto hL = FourVector((1/ mass_out) * energy_in * direction_out, (1/ mass_out) * lept_out.Vec3().Magnitude());
-    auto hT = FourVector(direction_out.Cross(direction_out.Cross(direction_in)), 0);
+    auto hL = -(1/ mass_out) * FourVector( energy_out * direction_out, lept_out.Vec3().Magnitude());
+    auto hT = FourVector((direction_in.Cross(direction_out)).Cross(direction_out / 
+                ((direction_in.Cross(direction_out)).Cross(direction_out)).Magnitude()), 0);
 
     std::map<std::pair<PID, PID>, std::vector<std::array<std::array<std::complex<double>,4>,4>>> hadronTensor;
     std::map<std::pair<PID, PID>, std::array<std::array<std::complex<double>,4>,4>> leptonTensor;
@@ -302,8 +304,6 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
     pL.resize(hadronCurrent.size());
     pT.resize(hadronCurrent.size());
     
-    std::complex<double> leviL;
-    std::complex<double> leviT;
     std::complex<double> hLk;
     std::complex<double> hTk;
     std::complex<double> gkL;
@@ -328,11 +328,13 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
         for(size_t nu = 0; nu < 4; ++nu) {
             hLk = hL[mu]*lept_in[nu] + lept_in[mu]*hL[nu];
             hTk = hT[mu]*lept_in[nu] + lept_in[mu]*hT[nu];
+            std::complex<double> leviL{};
+            std::complex<double> leviT{};
             for(size_t alpha = 0; alpha < 4; ++alpha) {
                 for(size_t beta = 0; beta < 4; ++beta) {
                     std::complex<double> i = {0,1};
                     leviL += LeviCivita(mu,nu,alpha,beta)*hL[alpha]*lept_in[beta]*i;
-                    leviT += LeviCivita(mu,nu,alpha,beta)*hT[alpha]*lept_in[beta]*i;        
+                    leviT -= LeviCivita(mu,nu,alpha,beta)*hT[alpha]*lept_in[beta]*i;        
                 }                   
             } 
             for(size_t k = 0; k < hadronCurrent.size(); ++k) {
@@ -343,8 +345,8 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
                 if ((amps2[k] != 0) && (amps2[k] == amps2[k])) {
                     double coupl2 = pow(Constant::ee/(Constant::sw*sqrt(2)), 2);
                     double prefact = coupl2/pow(Constant::MW, 4);
-                    pL[k] += mult * prefact * constant * real((mass_out*(hLk + gkL - leviL)*hadronTensor[{-24,-24}][k][mu][nu]));
-                    pT[k] += mult * prefact * constant * real((mass_out*(hTk + gkT + leviT)*hadronTensor[{-24,-24}][k][mu][nu]));
+                    pL[k] += mult * prefact * constant * real((-mass_out*(hLk + gkL - leviL)*hadronTensor[{-24,-24}][k][mu][nu]));
+                    pT[k] += mult * prefact * constant * real((-mass_out*(hTk + gkT + leviT)*hadronTensor[{-24,-24}][k][mu][nu]));
                 }   
                 else if (amps2[k] == 0) {
                     pL[k] = 0;
@@ -355,7 +357,7 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
     }
     
     event.PolarizationL() = pL;
-    event.PolarizationT() = pT; 
+    event.PolarizationT() = pT;
 
     if(!ParticleInfo(m_leptonicProcess.m_ids[0]).IsNeutrino()) spin_avg *= 2;
     if(m_nuclear -> NSpins() > 1) spin_avg *= 2;
