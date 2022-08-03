@@ -189,10 +189,10 @@ achilles::Currents HardScattering::LeptonicCurrents(const std::vector<FourVector
 
 std::vector<double> HardScattering::CrossSection(Event &event) const {
     // fixing momentum to compare with Josh's values
-    event.Momentum()[0] = FourVector(8.56829491e+02, 9.50041438e+01, -2.44099566e+02, -5.28933087e+02);
+    /* event.Momentum()[0] = FourVector(8.56829491e+02, 9.50041438e+01, -2.44099566e+02, -5.28933087e+02);
     event.Momentum()[2] = FourVector(1.17898839e+03, -4.93942012e+02, -5.02506265e+02, 1.16954573e+02);
     event.Momentum()[1] = FourVector(6.00000000e+03, 0.00000000e+00, 0.00000000e+00, 6.00000000e+03); 
-    event.Momentum()[3] = FourVector(5.67784110e+03, 5.88946155e+02, 2.58406700e+02, 5.35411234e+03);
+    event.Momentum()[3] = FourVector(5.67784110e+03, 5.88946155e+02, 2.58406700e+02, 5.35411234e+03); */
 
     // Calculate leptonic currents
     auto leptonCurrent = LeptonicCurrents(event.Momentum(), 100);
