@@ -492,12 +492,12 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
                 if ( (amps2[k] != 0) && (amps2[k] == amps2[k]) ) {
                     hkkh_contract[0][k] += mult * hkkh[0][mu][nu] * hadronTensor[{-24, -24}][k][mu][nu];
                     hkkh_contract[1][k] += mult * hkkh[1][mu][nu] * hadronTensor[{-24, -24}][k][mu][nu];
-                    gkh_contract[0][k] += mult * gkh[0][mu][nu] * hadronTensor[{-24, -24}][k][mu][nu];
-                    gkh_contract[1][k] += mult * gkh[1][mu][nu] * hadronTensor[{-24, -24}][k][mu][nu];
-                    iehk_contract[0][k] += mult * iehk[0][mu][nu] * hadronTensor[{-24, -24}][k][mu][nu];
-                    iehk_contract[1][k] += mult * iehk[1][mu][nu] * hadronTensor[{-24, -24}][k][mu][nu];
-                    p_num[0][k] += prefact * mult1 * mass_out * mult * (hkkh[0][mu][nu] - gkh[0][mu][nu] + mult2 * iehk[0][mu][nu]) * hadronTensor[{-24, -24}][k][mu][nu];
-                    p_num[1][k] += prefact * mult1 * mass_out * mult * (hkkh[1][mu][nu] - gkh[1][mu][nu] + mult2 * iehk[1][mu][nu]) * hadronTensor[{-24, -24}][k][mu][nu];
+                    gkh_contract[0][k] += gkh[0][mu][nu] * hadronTensor[{-24, -24}][k][mu][nu];
+                    gkh_contract[1][k] += gkh[1][mu][nu] * hadronTensor[{-24, -24}][k][mu][nu];
+                    iehk_contract[0][k] += iehk[0][mu][nu] * hadronTensor[{-24, -24}][k][mu][nu];
+                    iehk_contract[1][k] += iehk[1][mu][nu] * hadronTensor[{-24, -24}][k][mu][nu];
+                    p_num[0][k] += prefact * mult1 * mass_out * (mult * hkkh[0][mu][nu] - gkh[0][mu][nu] + mult2 * iehk[0][mu][nu]) * hadronTensor[{-24, -24}][k][mu][nu];
+                    p_num[1][k] += prefact * mult1 * mass_out * (mult * hkkh[1][mu][nu] - gkh[1][mu][nu] + mult2 * iehk[1][mu][nu]) * hadronTensor[{-24, -24}][k][mu][nu];
                 }
                 else {
                     p_num[0][k] = 0;
@@ -546,19 +546,19 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
             } */
         }
     }
-    spdlog::info("{}", hkkh_contract[0][1]);
+    /* spdlog::info("{}", hkkh_contract[0][1]);
     spdlog::info("{}", hkkh_contract[1][1]);
     spdlog::info("{}", gkh_contract[0][1]);
     spdlog::info("{}", gkh_contract[1][1]);
     spdlog::info("{}", iehk_contract[0][1]);
     spdlog::info("{}", iehk_contract[1][1]);
-    throw;
+    throw; */
 
     /* spdlog::info("{}", "pin = {:^8.5e}, pout = {:^8.5e}\n", event.Momentum()[0], event.Momentum()[2]);
     spdlog::info("kin = {:^8.5e}, kout = {:^8.5e}\n", event.Momentum()[1], event.Momentum()[3]);
     spdlog::info("k = 0, num_L = {:^8.5e}, num_T = {:^8.5e}, xsec = {:^8.5e}\n", p_num[0][0], p_num[0][1], event.Weight());
     spdlog::info("k = 1, num_L = {:^8.5e}, num_T = {:^8.5e}, xsec = {:^8.5e}\n", p_num[1][0], p_num[1][1], event.Weight()); */
-    spdlog::info("{}", "pin:");
+    /* spdlog::info("{}", "pin:");
     spdlog::info("{}", event.Momentum()[0]);
     spdlog::info("{}", "pout:");
     spdlog::info("{}", event.Momentum()[2]);
@@ -578,7 +578,7 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
     spdlog::info("{}", "num_L:");
     spdlog::info("{}", p_num[0][1]);
     spdlog::info("{}", "num_T:");
-    spdlog::info("{}", p_num[1][1]);
+    spdlog::info("{}", p_num[1][1]); */
 
     // throw;
 
