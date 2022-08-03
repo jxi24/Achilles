@@ -188,6 +188,12 @@ achilles::Currents HardScattering::LeptonicCurrents(const std::vector<FourVector
 }
 
 std::vector<double> HardScattering::CrossSection(Event &event) const {
+    // fixing momentum to compare with Josh's values
+    event.Momentum()[0] = FourVector(8.56829491e+02, 9.50041438e+01, -2.44099566e+02, -5.28933087e+02);
+    event.Momentum()[2] = FourVector(1.17898839e+03, -4.93942012e+02, -5.02506265e+02, 1.16954573e+02);
+    event.Momentum()[1] = FourVector(6.00000000e+03, 0.00000000e+00, 0.00000000e+00, 6.00000000e+03); 
+    event.Momentum()[3] = FourVector(5.67784110e+03, 5.88946155e+02, 2.58406700e+02, 5.35411234e+03);
+
     // Calculate leptonic currents
     auto leptonCurrent = LeptonicCurrents(event.Momentum(), 100);
 
@@ -525,6 +531,34 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
             } */
         }
     }
+
+    /* spdlog::info("{}", "pin = {:^8.5e}, pout = {:^8.5e}\n", event.Momentum()[0], event.Momentum()[2]);
+    spdlog::info("kin = {:^8.5e}, kout = {:^8.5e}\n", event.Momentum()[1], event.Momentum()[3]);
+    spdlog::info("k = 0, num_L = {:^8.5e}, num_T = {:^8.5e}, xsec = {:^8.5e}\n", p_num[0][0], p_num[0][1], event.Weight());
+    spdlog::info("k = 1, num_L = {:^8.5e}, num_T = {:^8.5e}, xsec = {:^8.5e}\n", p_num[1][0], p_num[1][1], event.Weight()); */
+    spdlog::info("{}", "pin:");
+    spdlog::info("{}", event.Momentum()[0]);
+    spdlog::info("{}", "pout:");
+    spdlog::info("{}", event.Momentum()[2]);
+
+    spdlog::info("{}", "kin:");
+    spdlog::info("{}", event.Momentum()[1]);
+    spdlog::info("{}", "kout:");
+    spdlog::info("{}", event.Momentum()[3]);
+
+    spdlog::info("{}", "k = 0:");
+    spdlog::info("{}", "num_L:");
+    spdlog::info("{}", p_num[0][0]);
+    spdlog::info("{}", "num_T:");
+    spdlog::info("{}", p_num[1][0]);
+    
+    spdlog::info("{}", "k = 1:");
+    spdlog::info("{}", "num_L:");
+    spdlog::info("{}", p_num[0][1]);
+    spdlog::info("{}", "num_T:");
+    spdlog::info("{}", p_num[1][1]);
+
+    throw;
 
     // print + check num
     /* if ( (amps2[1] != 0) && (amps2[1] == amps2[1]) ) {
