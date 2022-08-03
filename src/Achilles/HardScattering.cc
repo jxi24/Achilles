@@ -426,13 +426,17 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
 
     // calculate iehk
     std::vector<std::array<std::array<std::complex<double>,4>,4>> iehk(2);
-    std::complex<double> i = (0, 1);
+    std::complex<double> i = {0, 1};
+    // spdlog::info("{}", i);
     for(size_t mu = 0; mu < 4; ++mu) {
         for(size_t nu = 0; nu < 4; ++nu) {
             for(size_t alpha = 0; alpha < 4; ++alpha) {
                 for(size_t beta = 0; beta < 4; ++beta) {
+                    // std::complex<double> levi_complex = {LeviCivita(mu, nu, alpha, beta), 0};
+                    // spdlog::info("{}", LeviCivita(mu, nu, alpha, beta));
+                    // spdlog::info("{}", levi_complex);
                     // calculate ieh_l * k
-                    iehk[0][mu][nu] += i * (std::complex<double>)(LeviCivita(mu, nu, alpha, beta)) * hl[alpha] * lept_in[beta];
+                    iehk[0][mu][nu] += LeviCivita(mu, nu, alpha, beta) * hl[alpha] * lept_in[beta] * i;
                     // print + check iehk components
                     /* if ( (amps2[1] != 0) && (amps2[1] == amps2[1]) ) {
                         spdlog::info("{}", (std::complex<double>)(LeviCivita(mu, nu, alpha, beta)));
@@ -442,15 +446,20 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
                         spdlog::info("{}", amps2[1]);
                     } */
                     // calculate ieh_t * k
-                    iehk[1][mu][nu] += i * (std::complex<double>)(LeviCivita(mu, nu, alpha, beta)) * ht[alpha] * lept_in[beta];
+                    iehk[1][mu][nu] += LeviCivita(mu, nu, alpha, beta) * ht[alpha] * lept_in[beta] * i;
                 }
             }
         }
     }
-    // throw;
 
     // calculate numerator
     std::vector<std::array<std::complex<double>, 2>> p_num(2);
+    // vector to test hkkh contraction with W and compare with Josh
+    std::vector<std::array<std::complex<double>, 2>> hkkh_contract(2);
+    // vector to test gkh contraction with W and compare with Josh
+    std::vector<std::array<std::complex<double>, 2>> gkh_contract(2);
+    // vector to test gkh contraction with W and compare with Josh
+    std::vector<std::array<std::complex<double>, 2>> iehk_contract(2);
 
     // calculate prefactor and coupling
     double coupl2 = pow(Constant::ee/(Constant::sw*sqrt(2)), 2);
@@ -481,8 +490,14 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
                 spdlog::info("{}", iehk[1][mu][nu]);
                 spdlog::info("{}", hadronTensor[{-24, -24}][k][mu][nu]); */
                 if ( (amps2[k] != 0) && (amps2[k] == amps2[k]) ) {
-                    p_num[0][k] += prefact * mult1 * mass_out * (mult * hkkh[0][mu][nu] - gkh[0][mu][nu] + mult2 * iehk[0][mu][nu]) * hadronTensor[{-24, -24}][k][mu][nu];
-                    p_num[1][k] += prefact * mult1 * mass_out * (mult * hkkh[1][mu][nu] - gkh[1][mu][nu] + mult2 * iehk[1][mu][nu]) * hadronTensor[{-24, -24}][k][mu][nu];
+                    hkkh_contract[0][k] += mult * hkkh[0][mu][nu] * hadronTensor[{-24, -24}][k][mu][nu];
+                    hkkh_contract[1][k] += mult * hkkh[1][mu][nu] * hadronTensor[{-24, -24}][k][mu][nu];
+                    gkh_contract[0][k] += mult * gkh[0][mu][nu] * hadronTensor[{-24, -24}][k][mu][nu];
+                    gkh_contract[1][k] += mult * gkh[1][mu][nu] * hadronTensor[{-24, -24}][k][mu][nu];
+                    iehk_contract[0][k] += mult * iehk[0][mu][nu] * hadronTensor[{-24, -24}][k][mu][nu];
+                    iehk_contract[1][k] += mult * iehk[1][mu][nu] * hadronTensor[{-24, -24}][k][mu][nu];
+                    p_num[0][k] += prefact * mult1 * mass_out * mult * (hkkh[0][mu][nu] - gkh[0][mu][nu] + mult2 * iehk[0][mu][nu]) * hadronTensor[{-24, -24}][k][mu][nu];
+                    p_num[1][k] += prefact * mult1 * mass_out * mult * (hkkh[1][mu][nu] - gkh[1][mu][nu] + mult2 * iehk[1][mu][nu]) * hadronTensor[{-24, -24}][k][mu][nu];
                 }
                 else {
                     p_num[0][k] = 0;
@@ -531,6 +546,13 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
             } */
         }
     }
+    spdlog::info("{}", hkkh_contract[0][1]);
+    spdlog::info("{}", hkkh_contract[1][1]);
+    spdlog::info("{}", gkh_contract[0][1]);
+    spdlog::info("{}", gkh_contract[1][1]);
+    spdlog::info("{}", iehk_contract[0][1]);
+    spdlog::info("{}", iehk_contract[1][1]);
+    throw;
 
     /* spdlog::info("{}", "pin = {:^8.5e}, pout = {:^8.5e}\n", event.Momentum()[0], event.Momentum()[2]);
     spdlog::info("kin = {:^8.5e}, kout = {:^8.5e}\n", event.Momentum()[1], event.Momentum()[3]);
@@ -558,7 +580,7 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
     spdlog::info("{}", "num_T:");
     spdlog::info("{}", p_num[1][1]);
 
-    throw;
+    // throw;
 
     // print + check num
     /* if ( (amps2[1] != 0) && (amps2[1] == amps2[1]) ) {
