@@ -17,6 +17,8 @@ class FormFactorBuilder;
 
 struct FormFactorInfo {
     enum class Type {
+        F1,
+        F2,
         F1p,
         F1n,
         F2p,

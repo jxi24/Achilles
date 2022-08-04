@@ -8,6 +8,7 @@
 using achilles::NuclearModel;
 using achilles::Coherent;
 using achilles::QESpectral;
+using Type = achilles::FormFactorInfo::Type;
 
 NuclearModel::NuclearModel(const YAML::Node& config,
                            FormFactorBuilder &ffbuilder = FormFactorBuilder::Instance()) {
@@ -21,31 +22,34 @@ NuclearModel::NuclearModel(const YAML::Node& config,
                              .build();
 }
 
-NuclearModel::FormFactorArray NuclearModel::CouplingsFF(const FormFactor::Values &formFactors,
-                                                        const std::vector<FormFactorInfo> &ffInfo) const {
-    FormFactorArray results{};
+NuclearModel::FormFactorMap NuclearModel::CouplingsFF(const FormFactor::Values &formFactors,
+                                                      const std::vector<FormFactorInfo> &ffInfo) const {
+    FormFactorMap results{};
 
     for(const auto & ff : ffInfo) {
         spdlog::trace("Form Factor: {}, Coupling: {}", ff.form_factor, ff.coupling);
         switch(ff.form_factor) {
-            case FormFactorInfo::Type::F1p:
-                results[0] += formFactors.F1p*ff.coupling;
+            case Type::F1p:
+                results[Type::F1] += formFactors.F1p*ff.coupling;
                 break;
-            case FormFactorInfo::Type::F1n:
-                results[0] += formFactors.F1n*ff.coupling;
+            case Type::F1n:
+                results[Type::F1] += formFactors.F1n*ff.coupling;
                 break;
-            case FormFactorInfo::Type::F2p:
-                results[1] += formFactors.F2p*ff.coupling;
+            case Type::F2p:
+                results[Type::F2] += formFactors.F2p*ff.coupling;
                 break;
-            case FormFactorInfo::Type::F2n:
-                results[1] += formFactors.F2n*ff.coupling;
+            case Type::F2n:
+                results[Type::F2] += formFactors.F2n*ff.coupling;
                 break;
-            case FormFactorInfo::Type::FA:
-                results[2] += formFactors.FA*ff.coupling;
+            case Type::FA:
+                results[Type::FA] += formFactors.FA*ff.coupling;
                 break;
-            case FormFactorInfo::Type::FCoh:
-                results[3] += formFactors.Fcoh*ff.coupling;
+            case Type::FCoh:
+                results[Type::FCoh] += formFactors.Fcoh*ff.coupling;
                 break;
+            case Type::F1:
+            case Type::F2:
+                throw std::runtime_error("Types F1 and F2 are reserved for nuclear models");
         }
     }
 
@@ -78,12 +82,12 @@ std::vector<achilles::NuclearModel::Currents> Coherent::CalcCurrents(const Event
     std::vector<Currents> results(1);
     for(const auto &formFactor : ff[2]) {
         auto ffVal = CouplingsFF(ffVals, formFactor.second);
-        spdlog::trace("fcoh = {}", ffVal[3]);
+        spdlog::trace("fcoh = {}", ffVal[Type::FCoh]);
 
         Current current;
         std::vector<std::complex<double>> subcur(4);
         for(size_t i = 0; i < subcur.size(); ++i) {
-            subcur[i] = (pIn[i] + pOut[i])*ffVal[3];
+            subcur[i] = (pIn[i] + pOut[i])*ffVal[Type::FCoh];
         }
         current.push_back(subcur);
         results[0][formFactor.first] = current;
@@ -176,7 +180,8 @@ std::vector<NuclearModel::Currents> QESpectral::CalcCurrents(const Event &event,
         // Calculate nucleon contributions
         for(const auto &formFactor : ff[i]) {
             auto ffVal = CouplingsFF(ffVals, formFactor.second);
-            spdlog::debug("{}: f1 = {}, f2 = {}, fa = {}", i, ffVal[0], ffVal[1], ffVal[2]);
+            spdlog::debug("{}: f1 = {}, f2 = {}, fa = {}",
+                          i, ffVal[Type::F1], ffVal[Type::F2], ffVal[Type::FA]);
             auto current = HadronicCurrent(ubar, u, qVec, ffVal);
             for(auto &subcur : current) {
                 for(auto &val : subcur) {
@@ -241,14 +246,19 @@ std::unique_ptr<NuclearModel> QESpectral::Construct(const YAML::Node &config) {
 NuclearModel::Current QESpectral::HadronicCurrent(const std::array<Spinor, 2> &ubar,
                                                   const std::array<Spinor, 2> &u,
                                                   const FourVector &qVec,
-                                                  const FormFactorArray &ffVal) const {
+                                                  const FormFactorMap &ffVal) const {
     Current result;
     std::array<SpinMatrix, 4> gamma{};
+    auto mpi2 = pow(ParticleInfo(211).Mass(), 2);
+    auto ffAP = 2.0*Constant::mN2/(-qVec.M2()+mpi2)*ffVal.at(Type::FA);
     for(size_t mu = 0; mu < 4; ++mu) {
-        gamma[mu] = ffVal[0]*SpinMatrix::GammaMu(mu) + ffVal[2]*SpinMatrix::GammaMu(mu)*SpinMatrix::Gamma_5();
+        gamma[mu] = ffVal.at(Type::F1)*SpinMatrix::GammaMu(mu);
+        gamma[mu] += ffVal.at(Type::FA)*SpinMatrix::GammaMu(mu)*SpinMatrix::Gamma_5();
+        // REMOVE: 0.0
+        gamma[mu] += 0.0*ffAP*SpinMatrix::Gamma_5()*qVec[mu]/Constant::mN;
         double sign = 1;
         for(size_t nu = 0; nu < 4; ++nu) {
-            gamma[mu] += std::complex<double>(0, 1)*(ffVal[1]*SpinMatrix::SigmaMuNu(mu, nu)*sign*qVec[nu]/(2*Constant::mN));
+            gamma[mu] += std::complex<double>(0, 1)*(ffVal.at(Type::F2)*SpinMatrix::SigmaMuNu(mu, nu)*sign*qVec[nu]/(2*Constant::mN));
             sign = -1;
         }
     }
