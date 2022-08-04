@@ -33,7 +33,7 @@ class NuclearModel {
         using Current = std::vector<std::vector<std::complex<double>>>;
         using Currents = std::map<int, Current>;
         using FFInfoMap = std::map<int, std::vector<FormFactorInfo>>;
-        using FormFactorArray = std::array<std::complex<double>, 4>;
+        using FormFactorMap = std::map<FormFactorInfo::Type, std::complex<double>>;
 
         NuclearModel() = default;
         NuclearModel(const YAML::Node&, FormFactorBuilder&);
@@ -54,8 +54,8 @@ class NuclearModel {
 
     protected:
         FormFactor::Values EvalFormFactor(double q2) const { return m_form_factor -> operator()(q2); }
-        FormFactorArray CouplingsFF(const FormFactor::Values&,
-                                    const std::vector<FormFactorInfo>&) const;
+        FormFactorMap CouplingsFF(const FormFactor::Values&,
+                                  const std::vector<FormFactorInfo>&) const;
         static YAML::Node LoadFormFactor(const YAML::Node&);
 
     private:
@@ -104,7 +104,7 @@ class QESpectral : public NuclearModel, RegistrableNuclearModel<QESpectral> {
     private:
         bool b_ward{};
         Current HadronicCurrent(const std::array<Spinor, 2>&, const std::array<Spinor, 2>&,
-                                const FourVector&, const FormFactorArray&) const;
+                                const FourVector&, const FormFactorMap&) const;
         SpectralFunction spectral_proton, spectral_neutron; 
 };
 
