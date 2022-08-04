@@ -189,6 +189,13 @@ achilles::Currents HardScattering::LeptonicCurrents(const std::vector<FourVector
 }
 
 std::vector<double> HardScattering::CrossSection(Event &event) const {
+    //debugging 
+    event.Momentum()[0] = FourVector(8.56829491e+02, 9.50041438e+01, -2.44099566e+02, -5.28933087e+02);
+    event.Momentum()[2] = FourVector(1.17898839e+03, -4.93942012e+02, -5.02506265e+02, 1.16954573e+02);
+    event.Momentum()[1] = FourVector(6.00000000e+03, 0.00000000e+00, 0.00000000e+00, 6.00000000e+03); 
+    event.Momentum()[3] = FourVector(5.67784110e+03, 5.88946155e+02, 2.58406700e+02, 5.35411234e+03);
+
+
     // Calculate leptonic currents
     auto leptonCurrent = LeptonicCurrents(event.Momentum(), 100);
 
@@ -243,16 +250,15 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
 
     auto lept_in = event.Momentum()[1];
     auto lept_out = event.Momentum().back();
-    auto energy_in = lept_in.E();
+    //auto energy_in = lept_in.E();
     auto energy_out = lept_out.E();
     auto mass_out = lept_out.M();
     // auto mom_in = lept_in.Vec3().Magnitude();
     auto direction_in = lept_in.Vec3().Unit();
     auto direction_out = lept_out.Vec3().Unit();
 
-    auto hL = -(1/ mass_out) * FourVector( energy_out * direction_out, lept_out.Vec3().Magnitude());
-    auto hT = FourVector((direction_in.Cross(direction_out)).Cross(direction_out / 
-                ((direction_in.Cross(direction_out)).Cross(direction_out)).Magnitude()), 0);
+    auto hL = (1/ mass_out) * FourVector( energy_out * direction_out, lept_out.Vec3().Magnitude());
+    auto hT = FourVector((((lept_in.Vec3()).Cross(lept_out.Vec3())).Cross(lept_out.Vec3())).Unit(), 0);
 
     std::map<std::pair<PID, PID>, std::vector<std::array<std::array<std::complex<double>,4>,4>>> hadronTensor;
     std::map<std::pair<PID, PID>, std::array<std::array<std::complex<double>,4>,4>> leptonTensor;
@@ -301,13 +307,15 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
 
     std::vector<double> pL;
     std::vector<double> pT;
+    //std::vector<double> term1;
+    //term1.resize(hadronCurrent.size());
     pL.resize(hadronCurrent.size());
     pT.resize(hadronCurrent.size());
     
-    std::complex<double> hLk;
-    std::complex<double> hTk;
-    std::complex<double> gkL;
-    std::complex<double> gkT;
+    std::array<std::array<std::complex<double>,4>,4> hLk;
+    std::array<std::array<std::complex<double>,4>,4> hTk;
+    std::array<std::array<std::complex<double>,4>,4> gkL;
+    std::array<std::array<std::complex<double>,4>,4> gkT;
 
     double spin_avg = 1;
     double mass = ParticleInfo(m_leptonicProcess.m_states.begin()->first[0]).Mass();
@@ -315,19 +323,22 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
     static constexpr double to_nb = 1e6;
     double constant = (Constant::HBARC2/spin_avg/flux*to_nb);
 
-    double sign = 0;
     for(size_t mu = 0; mu < 4; ++mu) {
-        if ( mu == 0) {
-            sign = 1;
-        }
-        else if ( mu != 0) {
-            sign = -1;
-        }
-        gkL = - sign*lept_in*hL;
-        gkT = - sign*lept_in*hT;
         for(size_t nu = 0; nu < 4; ++nu) {
-            hLk = hL[mu]*lept_in[nu] + lept_in[mu]*hL[nu];
-            hTk = hT[mu]*lept_in[nu] + lept_in[mu]*hT[nu];
+            hLk[mu][nu] = hL[mu]*lept_in[nu] + lept_in[mu]*hL[nu];
+            hTk[mu][nu] = hT[mu]*lept_in[nu] + lept_in[mu]*hT[nu];
+        }
+    }
+    for(size_t mu = 0; mu < 4; ++mu) {
+        double g = -1;
+        if (mu == 0) {
+            g = 1;
+        }
+        gkL[mu][mu] = - g * lept_in * hL;
+        gkT[mu][mu] = - g * lept_in * hT;
+    }
+    for(size_t mu = 0; mu < 4; ++mu) {
+        for(size_t nu = 0; nu < 4; ++nu) {
             std::complex<double> leviL{};
             std::complex<double> leviT{};
             for(size_t alpha = 0; alpha < 4; ++alpha) {
@@ -345,8 +356,9 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
                 if ((amps2[k] != 0) && (amps2[k] == amps2[k])) {
                     double coupl2 = pow(Constant::ee/(Constant::sw*sqrt(2)), 2);
                     double prefact = coupl2/pow(Constant::MW, 4);
-                    pL[k] += mult * prefact * constant * real((-mass_out*(hLk + gkL - leviL)*hadronTensor[{-24,-24}][k][mu][nu]));
-                    pT[k] += mult * prefact * constant * real((-mass_out*(hTk + gkT + leviT)*hadronTensor[{-24,-24}][k][mu][nu]));
+                    pL[k] += mult * prefact * constant * real((-mass_out*(hLk[mu][nu] + gkL[mu][nu] - leviL)*hadronTensor[{-24,-24}][k][mu][nu]));
+                    pT[k] += mult * prefact * constant * real((-mass_out*(hTk[mu][nu] + gkT[mu][nu] + leviT)*hadronTensor[{-24,-24}][k][mu][nu]));
+                    //term1[k] += real(((leviT)*hadronTensor[{-24,-24}][k][mu][nu]));
                 }   
                 else if (amps2[k] == 0) {
                     pL[k] = 0;
@@ -370,8 +382,13 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
         xsecs[i] = amps2[i]*Constant::HBARC2/spin_avg/flux*to_nb;
         spdlog::debug("Xsec[{}] = {}", i, xsecs[i]);
     }
-
+    //spdlog::info(pT[1]);
+    //spdlog::info(pL[1]);
+    //spdlog::info(term1[1]);
+    //spdlog::info(xsecs[1]);
+    //throw;
     return xsecs;
+
 }
 
 bool HardScattering::FillEvent(Event& event, const std::vector<double> &xsecs) const {
