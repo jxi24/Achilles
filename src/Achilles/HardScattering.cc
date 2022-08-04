@@ -319,7 +319,6 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
             }
         }    
     } 
-
     // print + check to see if W and amps are 0
     /* for(size_t mu = 0; mu < 4; ++mu) {
         for(size_t nu = 0; nu < 4; ++nu) {
@@ -455,11 +454,11 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
     // calculate numerator
     std::vector<std::array<std::complex<double>, 2>> p_num(2);
     // vector to test hkkh contraction with W and compare with Josh
-    std::vector<std::array<std::complex<double>, 2>> hkkh_contract(2);
+    /* std::vector<std::array<std::complex<double>, 2>> hkkh_contract(2);
     // vector to test gkh contraction with W and compare with Josh
     std::vector<std::array<std::complex<double>, 2>> gkh_contract(2);
     // vector to test gkh contraction with W and compare with Josh
-    std::vector<std::array<std::complex<double>, 2>> iehk_contract(2);
+    std::vector<std::array<std::complex<double>, 2>> iehk_contract(2); */
 
     // calculate prefactor and coupling
     double coupl2 = pow(Constant::ee/(Constant::sw*sqrt(2)), 2);
@@ -490,12 +489,17 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
                 spdlog::info("{}", iehk[1][mu][nu]);
                 spdlog::info("{}", hadronTensor[{-24, -24}][k][mu][nu]); */
                 if ( (amps2[k] != 0) && (amps2[k] == amps2[k]) ) {
+                    /* spdlog::info("{}", "entered if");
                     hkkh_contract[0][k] += mult * hkkh[0][mu][nu] * hadronTensor[{-24, -24}][k][mu][nu];
+                    spdlog::info("{}", 494);
                     hkkh_contract[1][k] += mult * hkkh[1][mu][nu] * hadronTensor[{-24, -24}][k][mu][nu];
+                    spdlog::info("{}", 496);
                     gkh_contract[0][k] += gkh[0][mu][nu] * hadronTensor[{-24, -24}][k][mu][nu];
+                    spdlog::info("{}", 498);
                     gkh_contract[1][k] += gkh[1][mu][nu] * hadronTensor[{-24, -24}][k][mu][nu];
+                    spdlog::info("{}", 500);
                     iehk_contract[0][k] += iehk[0][mu][nu] * hadronTensor[{-24, -24}][k][mu][nu];
-                    iehk_contract[1][k] += iehk[1][mu][nu] * hadronTensor[{-24, -24}][k][mu][nu];
+                    iehk_contract[1][k] += iehk[1][mu][nu] * hadronTensor[{-24, -24}][k][mu][nu]; */
                     p_num[0][k] += prefact * mult1 * mass_out * (mult * hkkh[0][mu][nu] - gkh[0][mu][nu] + mult2 * iehk[0][mu][nu]) * hadronTensor[{-24, -24}][k][mu][nu];
                     p_num[1][k] += prefact * mult1 * mass_out * (mult * hkkh[1][mu][nu] - gkh[1][mu][nu] + mult2 * iehk[1][mu][nu]) * hadronTensor[{-24, -24}][k][mu][nu];
                 }
