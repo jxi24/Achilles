@@ -313,6 +313,9 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
     std::array<std::array<std::complex<double>,4>,4> gkT;
 
     double spin_avg = 1;
+    if(!ParticleInfo(m_leptonicProcess.m_ids[0]).IsNeutrino()) spin_avg *= 2;
+    if(m_nuclear -> NSpins() > 1) spin_avg *= 2;
+
     double mass = ParticleInfo(m_leptonicProcess.m_states.begin()->first[0]).Mass();
     double flux = 2*event.Momentum()[1].E()*2*sqrt(event.Momentum()[0].P2() + mass*mass);
     static constexpr double to_nb = 1e6;
@@ -340,7 +343,7 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
                 for(size_t beta = 0; beta < 4; ++beta) {
                     std::complex<double> i = {0,1};
                     leviL += LeviCivita(mu,nu,alpha,beta)*hL[alpha]*lept_in[beta]*i;
-                    leviT -= LeviCivita(mu,nu,alpha,beta)*hT[alpha]*lept_in[beta]*i;        
+                    leviT += LeviCivita(mu,nu,alpha,beta)*hT[alpha]*lept_in[beta]*i;        
                 }                   
             } 
             for(size_t k = 0; k < hadronCurrent.size(); ++k) {
@@ -351,7 +354,7 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
                 if ((amps2[k] != 0) && (amps2[k] == amps2[k])) {
                     double coupl2 = pow(Constant::ee/(Constant::sw*sqrt(2)), 2);
                     double prefact = coupl2/pow(Constant::MW, 4);
-                    pL[k] += mult * prefact * constant * real((-mass_out*(hLk[mu][nu] + gkL[mu][nu] - leviL)*hadronTensor[{-24,-24}][k][mu][nu]));
+                    pL[k] += mult * prefact * constant * real((-mass_out*(hLk[mu][nu] + gkL[mu][nu] + leviL)*hadronTensor[{-24,-24}][k][mu][nu]));
                     pT[k] += mult * prefact * constant * real((-mass_out*(hTk[mu][nu] + gkT[mu][nu] + leviT)*hadronTensor[{-24,-24}][k][mu][nu]));
                     //term1[k] += real(((leviT)*hadronTensor[{-24,-24}][k][mu][nu]));
                 }   
@@ -362,12 +365,8 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
             }
         }
     }
-    
     event.PolarizationL() = pL;
     event.PolarizationT() = pT;
-
-    if(!ParticleInfo(m_leptonicProcess.m_ids[0]).IsNeutrino()) spin_avg *= 2;
-    if(m_nuclear -> NSpins() > 1) spin_avg *= 2;
 
     // TODO: Correct this flux
     // double flux = 4*sqrt(pow(event.Momentum()[0]*event.Momentum()[1], 2) 

@@ -255,7 +255,7 @@ NuclearModel::Current QESpectral::HadronicCurrent(const std::array<Spinor, 2> &u
         gamma[mu] = ffVal.at(Type::F1)*SpinMatrix::GammaMu(mu);
         gamma[mu] += ffVal.at(Type::FA)*SpinMatrix::GammaMu(mu)*SpinMatrix::Gamma_5();
         // REMOVE: 0.0
-        gamma[mu] += 0.0*ffAP*SpinMatrix::Gamma_5()*qVec[mu]/Constant::mN;
+        gamma[mu] += ffAP*SpinMatrix::Gamma_5()*qVec[mu]/Constant::mN;
         double sign = 1;
         for(size_t nu = 0; nu < 4; ++nu) {
             gamma[mu] += std::complex<double>(0, 1)*(ffVal.at(Type::F2)*SpinMatrix::SigmaMuNu(mu, nu)*sign*qVec[nu]/(2*Constant::mN));
