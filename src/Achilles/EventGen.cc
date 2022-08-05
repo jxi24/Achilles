@@ -657,9 +657,10 @@ double achilles::EventGen::GenerateEvent(const std::vector<FourVector> &mom, con
             fmt::print("Event weight = {:^8.5e}\n", event.Weight());
             fmt::print("Polarization_L Numerator (k = 1) = {:^8.5e}\n", event.get_p_num_l()[1]);
             fmt::print("Polarization_T Numerator (k = 1) = {:^8.5e}\n", event.get_p_num_t()[1]);
+            fmt::print("Beam Energy = {:^8.5e}\n", config["Beams"][0]["Beam"]["Beam Params"]["Energy"].as<double>());
             try {
                 std::cout << "Writing data to file" << "\n";
-                std::ofstream data("/Users/sherry/Desktop/Fermilab/q0_theta_pnum.txt", std::ios_base::app);
+                std::ofstream data("/Users/sherry/Desktop/Fermilab/q0_theta_pnum_" + std::to_string(config["Beams"][0]["Beam"]["Beam Params"]["Energy"].as<int>()) + ".txt", std::ios_base::app);
                 if (data.is_open() && Amps2[1] == Amps2[1]) {
                     data << Q0 << "\t" << Theta_degrees << "\t" << event.Weight() << "\t" << event.get_p_num_l()[1] * 6 * wgt << "\t" 
                     << event.get_p_num_t()[1] * 6 * wgt << "\n";
