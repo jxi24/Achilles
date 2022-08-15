@@ -466,8 +466,8 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
     // 24
     // -24
     // TODO: CHANGE FOR CASE OF ANTI PARTICLE
-    double mult1 = -1;
-    double mult2 = 1;
+    double mult1 = 1;
+    double mult2 = -1;
 
     for(size_t mu = 0; mu < 4; ++mu) {
         for(size_t nu = 0; nu < 4; ++nu) {
@@ -500,8 +500,8 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
                     spdlog::info("{}", 500);
                     iehk_contract[0][k] += iehk[0][mu][nu] * hadronTensor[{-24, -24}][k][mu][nu];
                     iehk_contract[1][k] += iehk[1][mu][nu] * hadronTensor[{-24, -24}][k][mu][nu]; */
-                    p_num[0][k] += prefact * mult1 * mass_out * (mult * hkkh[0][mu][nu] - gkh[0][mu][nu] + mult2 * iehk[0][mu][nu]) * hadronTensor[{-24, -24}][k][mu][nu];
-                    p_num[1][k] += prefact * mult1 * mass_out * (mult * hkkh[1][mu][nu] - gkh[1][mu][nu] + mult2 * iehk[1][mu][nu]) * hadronTensor[{-24, -24}][k][mu][nu];
+                    p_num[0][k] += prefact * mult1 * mass_out * (mult * hkkh[0][mu][nu] - gkh[0][mu][nu] + mult2 * iehk[0][mu][nu]) * hadronTensor[{24, 24}][k][mu][nu];
+                    p_num[1][k] += prefact * mult1 * mass_out * (mult * hkkh[1][mu][nu] - gkh[1][mu][nu] + mult2 * iehk[1][mu][nu]) * hadronTensor[{24, 24}][k][mu][nu];
                 }
                 else {
                     p_num[0][k] = 0;
