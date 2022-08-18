@@ -287,6 +287,8 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
     // W and L calculations
     std::map<std::pair<PID, PID>, std::vector<std::array<std::array<std::complex<double>,4>,4>>> hadronTensor;
     std::map<std::pair<PID, PID>, std::array<std::array<std::complex<double>,4>,4>> leptonTensor;
+    double anti = m_leptonicProcess.m_ids[0] < PID::undefined() ? 1 : -1;
+    std::pair<PID, PID> boson_pair = {(24 * anti), (24 * anti)};
 
     for(size_t mu = 0; mu < 4; ++mu) {
         for(size_t nu = 0; nu < 4; ++nu) {
@@ -317,6 +319,7 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
                     }
                 }   
             }
+            // spdlog::info("{}", leptonTensor[boson_pair][mu][nu]);
         }    
     } 
     // print + check to see if W and amps are 0
@@ -334,7 +337,48 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
         spdlog::info("{}", amps2[k]);
     }
     throw; */
-        
+
+    // hard coding leptonic tensor
+    // std::map<std::pair<PID, PID>, std::array<std::array<std::complex<double>,4>,4>> L;
+    std::array<std::array<double,4>,4> metricTensor;
+    for(size_t mu = 0; mu < 4; ++mu) {
+        for(size_t nu = 0; nu < 4; ++nu) {
+            if (mu == nu) {
+                if (mu == 0) {
+                    metricTensor[mu][nu] = 1;
+                }
+                else {
+                    metricTensor[mu][nu] = -1;
+                }
+            }
+            else {
+                metricTensor[mu][nu] = 0;
+            }
+        }
+    }
+    double coupl2 = pow(Constant::ee/(Constant::sw*sqrt(2)), 2);
+    double prefact = coupl2/pow(Constant::MW, 4);
+    /*for(size_t mu = 0; mu < 4; ++mu){
+        double metric = -1;
+        if (mu == 0) {
+            metric = 1;
+        }
+    }*/
+    std::complex<double> i = {0, 1};
+    std::array<std::array<std::complex<double>,4>,4> L;
+    for(size_t mu = 0; mu < 4; ++mu) {
+        for(size_t nu = 0; nu < 4; ++nu) {
+            L[mu][nu] = prefact * (lept_out[mu] * lept_in[nu] + lept_in[mu] * lept_out[nu] - metricTensor[mu][nu] * lept_in * lept_out);
+            for(size_t alpha = 0; alpha < 4; ++alpha) {
+                for(size_t beta = 0; beta < 4; ++beta) {
+                    L[mu][nu] += prefact * (LeviCivita(mu, nu, alpha, beta) * lept_out[alpha] * lept_in[beta] * i);
+                }
+            }
+            spdlog::info("{}", L[mu][nu]);
+        }
+    }
+    throw;
+    
 
     // compare to eqn 2
     // check to see if you got the right answer: contract hadronic tensor with leptonic tensor
@@ -366,6 +410,9 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
                     if ( ((mu == 0) && (nu != 0)) || ((mu != 0) && (nu == 0)) ) {
                         mult = -1;
                     }
+                    /* spdlog::info("{}", mult);
+                    spdlog::info("{}", leptonTensor[bosons][mu][nu]);
+                    spdlog::info("{}", hadronTensor[bosons][k][mu][nu]); */
                     contraction[k] += mult * leptonTensor[bosons][mu][nu] * hadronTensor[bosons][k][mu][nu];
                 }
             }
@@ -373,18 +420,19 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
     }
 
     // print + check if contractions match amps2[k]
-    /* if ( (amps2[1] != 0) && (amps2[1] == amps2[1]) ) {
-        // spdlog::info("{}", k);
-        spdlog::info("{}", amps2[1]);
-        spdlog::info("{}", contraction[1]);
-    } */
+    /* if ( (amps2[0] != 0) && (amps2[0] == amps2[0]) ) {
+        spdlog::info("{}", amps2[0]);
+        spdlog::info("{}", contraction[0]);
+    }
+    throw; */
 
     // print + check amps2[k] if valid
     /* if ( (amps2[0] != 0) && (amps2[0] == amps2[0]) ) {
         spdlog::info("{}", "Denominator:");
         spdlog::info("{}", amps2[0]);
-    } */
-    // throw;
+        spdlog::info("{}", contraction[0]);
+    }
+    throw; */
 
     // contractions and amps2[k] now agree!
 
@@ -425,7 +473,6 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
 
     // calculate iehk
     std::vector<std::array<std::array<std::complex<double>,4>,4>> iehk(2);
-    std::complex<double> i = {0, 1};
     // spdlog::info("{}", i);
     for(size_t mu = 0; mu < 4; ++mu) {
         for(size_t nu = 0; nu < 4; ++nu) {
@@ -461,13 +508,11 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
     std::vector<std::array<std::complex<double>, 2>> iehk_contract(2); */
 
     // calculate prefactor and coupling
-    double coupl2 = pow(Constant::ee/(Constant::sw*sqrt(2)), 2);
-    double prefact = coupl2/pow(Constant::MW, 4);
     // 24
     // -24
     // TODO: CHANGE FOR CASE OF ANTI PARTICLE
-    double mult1 = 1;
-    double mult2 = -1;
+    double mult1 = anti;
+    double mult2 = -1 * anti;
 
     for(size_t mu = 0; mu < 4; ++mu) {
         for(size_t nu = 0; nu < 4; ++nu) {
@@ -500,8 +545,8 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
                     spdlog::info("{}", 500);
                     iehk_contract[0][k] += iehk[0][mu][nu] * hadronTensor[{-24, -24}][k][mu][nu];
                     iehk_contract[1][k] += iehk[1][mu][nu] * hadronTensor[{-24, -24}][k][mu][nu]; */
-                    p_num[0][k] += prefact * mult1 * mass_out * (mult * hkkh[0][mu][nu] - gkh[0][mu][nu] + mult2 * iehk[0][mu][nu]) * hadronTensor[{24, 24}][k][mu][nu];
-                    p_num[1][k] += prefact * mult1 * mass_out * (mult * hkkh[1][mu][nu] - gkh[1][mu][nu] + mult2 * iehk[1][mu][nu]) * hadronTensor[{24, 24}][k][mu][nu];
+                    p_num[0][k] += prefact * mult1 * mass_out * (mult * hkkh[0][mu][nu] - gkh[0][mu][nu] + mult2 * iehk[0][mu][nu]) * hadronTensor[boson_pair][k][mu][nu];
+                    p_num[1][k] += prefact * mult1 * mass_out * (mult * hkkh[1][mu][nu] - gkh[1][mu][nu] + mult2 * iehk[1][mu][nu]) * hadronTensor[boson_pair][k][mu][nu];
                 }
                 else {
                     p_num[0][k] = 0;
