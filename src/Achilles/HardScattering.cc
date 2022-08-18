@@ -374,10 +374,10 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
                     L[mu][nu] += prefact * (LeviCivita(mu, nu, alpha, beta) * lept_out[alpha] * lept_in[beta] * i);
                 }
             }
-            spdlog::info("{}", L[mu][nu]);
+            // spdlog::info("{}", L[mu][nu] / leptonTensor[boson_pair][mu][nu]);
         }
     }
-    throw;
+    // throw;
     
 
     // compare to eqn 2
@@ -699,6 +699,13 @@ std::vector<double> HardScattering::CrossSection(Event &event) const {
     // connect polarization numerator to event code
     event.set_p_num_l({Constant::HBARC2/spin_avg/flux*to_nb * p_num[0][0].real(), Constant::HBARC2/spin_avg/flux*to_nb * p_num[0][1].real()});
     event.set_p_num_t({Constant::HBARC2/spin_avg/flux*to_nb * p_num[1][0].real(), Constant::HBARC2/spin_avg/flux*to_nb * p_num[1][1].real()});
+
+    for (size_t mu = 0; mu < 4; mu++) {
+        for (size_t nu = 0; nu < 4; nu++) {
+            spdlog::info("{}", (L[mu][nu] * Constant::HBARC2/spin_avg/flux*to_nb) / leptonTensor[boson_pair][mu][nu]);
+        }
+    }
+    throw;
 
     return xsecs;
 }
