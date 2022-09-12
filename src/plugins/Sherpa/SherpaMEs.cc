@@ -87,6 +87,8 @@ bool SherpaMEs::Initialize(const std::vector<std::string> &args)
   // addParameter(argv,"UFO_PARAM_CARD=parameters.dat");
   addParameter(argv,"PRIORITY[2112]=99");
   addParameter(argv,"PRIORITY[2212]=99");
+  addParameter(argv,"MASSIVE[13]=1");
+  addParameter(argv,"MASSIVE[15]=1");
   // TODO: Make this something that is passed in
   addParameter(argv,"PRIORITY[1000060120]=99");
   // add additional commandline parameters
