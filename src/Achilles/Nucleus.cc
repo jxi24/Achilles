@@ -9,6 +9,7 @@
 #include "spdlog/sinks/basic_file_sink.h"
 
 #include "Achilles/Constants.hh"
+#include "Achilles/Exception.hh"
 #include "Achilles/ThreeVector.hh"
 #include "Achilles/Particle.hh"
 #include "Achilles/Nucleus.hh"
@@ -39,7 +40,7 @@ Nucleus::Nucleus(const std::size_t& Z, const std::size_t& A, const double& bEner
         std::string errorMsg = "Requires the number of protons to be less than the total";
         errorMsg += " number of nucleons. Got " + std::to_string(Z);
         errorMsg += " protons and " + std::to_string(A) + " nucleons";
-        throw std::runtime_error(errorMsg);
+        throw nucleus_error(errorMsg);
     }
     
     nucleons.resize(A);
@@ -52,7 +53,7 @@ Nucleus::Nucleus(const std::size_t& Z, const std::size_t& A, const double& bEner
 
     std::ifstream densityFile(densityFilename);
     if(!densityFile.is_open())
-        throw std::runtime_error(fmt::format("Nucleus: Density file {} does not exist.", densityFilename));
+        throw nucleus_error(fmt::format("Density file {} does not exist.", densityFilename));
     std::string lineContent;
    
     constexpr size_t HeaderLength = 16;
@@ -77,7 +78,7 @@ Nucleus::Nucleus(const std::size_t& Z, const std::size_t& A, const double& bEner
     // not necessarily be caught 
     auto particles = density -> GetConfiguration();
     if(particles.size() != nucleons.size())
-        throw std::runtime_error("Invalid density function! Incorrect number of nucleons.");
+        throw nucleus_error("Invalid density function! Incorrect number of nucleons.");
 
     std::size_t nProtons = 0, nNeutrons = 0;
     for(auto particle : particles) {
@@ -86,7 +87,7 @@ Nucleus::Nucleus(const std::size_t& Z, const std::size_t& A, const double& bEner
     }
 
     if(nProtons != NProtons() || nNeutrons != NNeutrons())
-        throw std::runtime_error("Invalid density function! Incorrect number of protons or neutrons.");
+        throw nucleus_error("Invalid density function! Incorrect number of protons or neutrons.");
 
     static constexpr int IDBase = 1000000000;
     static constexpr int ZBase = 10000;
@@ -179,7 +180,7 @@ Nucleus Nucleus::MakeNucleus(const std::string& name, const double& bEnergy,
                        fg_type, std::move(density));
     }
 
-    throw std::runtime_error(fmt::format("Invalid nucleus {}.", name));
+    throw nucleus_error(fmt::format("Invalid nucleus {}.", name));
 }
 
 std::size_t Nucleus::NameToZ(const std::string& name) {
@@ -188,7 +189,7 @@ std::size_t Nucleus::NameToZ(const std::string& name) {
                                return p.second == name;
                           });
     if(it == ZToName.end()) 
-        throw std::runtime_error(fmt::format("Invalid nucleus: {} does not exist.", name));
+        throw nucleus_error(fmt::format("Invalid nucleus: {} does not exist.", name));
     return it -> first;
 }
 

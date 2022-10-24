@@ -24,25 +24,25 @@ class CutBase {
 
         CutBase(const YAML::Node &node) {
             if(node["min"] && node["max"] && node["range"]) {
-                throw std::runtime_error("CutRange: Invalid syntax. Got min, max, and range");
+                throw std::logic_error("CutRange: Invalid syntax. Got min, max, and range");
             } else if(node["min"] || node["max"]) {
                 T min = std::numeric_limits<T>::lowest();
                 T max = std::numeric_limits<T>::max();
                 if(node["min"]) {
                     if(!node["min"].IsScalar())
-                        throw std::runtime_error("CutRange: Invalid min value");
+                        throw std::logic_error("CutRange: Invalid min value");
                     min = node["min"].as<T>();
                 }
                 if(node["max"]) {
                     if(!node["max"].IsScalar())
-                        throw std::runtime_error("CutRange: Invalid max value");
+                        throw std::logic_error("CutRange: Invalid max value");
                     max = node["max"].as<T>();
                 }
                 m_range = {{min, max}}; 
             } else if(node["range"]) {
                 m_range = node["range"].as<cut_ranges>();
             } else {
-                throw std::runtime_error("CutRange: Invalid syntax. Missing cut values");
+                throw std::logic_error("CutRange: Invalid syntax. Missing cut values");
             }
             if(m_range.size() == 1) {
                 spdlog::trace("Found cut range: [{}, {}]", m_range[0].first, m_range[0].second);

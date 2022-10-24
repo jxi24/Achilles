@@ -96,8 +96,8 @@ class Spinor {
         }
 
         Complex operator*(const Spinor &other) const {
-            if(!m_bar) throw std::runtime_error("LHS spinor should be barred");
-            if(other.m_bar) throw std::runtime_error("RHS spinor should not be barred");
+            if(!m_bar) throw std::logic_error("Achilles::SpinorError: LHS spinor should be barred");
+            if(other.m_bar) throw std::logic_error("Achilles::SpinorError: RHS spinor should not be barred");
 
             return m_u[0]*other[0] + m_u[1]*other[1] + m_u[2]*other[2] + m_u[3]*other[3];
         }
@@ -171,7 +171,7 @@ class SpinMatrix {
             else if(i == 2) return Gamma_2();
             else if(i == 3) return Gamma_3();
             else if(i == 5) return Gamma_5();
-            else throw std::runtime_error("Invalid Gamma Matrix: " + i);
+            else throw std::logic_error(fmt::format("Invalid Gamma Matrix: {}", i));
         }
 
         static SpinMatrix PL();

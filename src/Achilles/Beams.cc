@@ -1,5 +1,6 @@
 #include "Achilles/Beams.hh"
 #include "Achilles/Constants.hh"
+#include "Achilles/Exception.hh"
 #include "Achilles/Interpolation.hh"
 #include "Achilles/Utilities.hh"
 
@@ -19,8 +20,8 @@ Spectrum::Spectrum(const YAML::Node &node) {
         std::ifstream hist(filename.c_str());
         spdlog::trace("Beam::Spectrum: Loading data from: {}", filename);
         if(hist.bad()) {
-            std::string msg = fmt::format("Beam::Spectrum: Can't open file {}", filename);
-            throw std::runtime_error(msg);
+            std::string msg = fmt::format("Can't open file {}", filename);
+            throw beam_error(msg);
         }
         std::string line;
 
@@ -52,8 +53,8 @@ Spectrum::Spectrum(const YAML::Node &node) {
             ehi_token = 2;
             flux_token = 3;
         } else {
-            std::string msg = fmt::format("Beam::Spectrum: Invalid flux format from file {}", filename);
-            throw std::runtime_error(msg);
+            std::string msg = fmt::format("Invalid flux format from file {}", filename);
+            throw beam_error(msg);
         }
 
         // Read in data
@@ -144,10 +145,10 @@ Spectrum::Spectrum(const YAML::Node &node) {
             m_delta_energy = m_max_energy - m_min_energy;
             m_energy_units = 1.0/1.0_GeV;
 #else
-            throw std::runtime_error("Achilles has not been compiled with ROOT support");
+            throw std::invalid_argument("Achilles has not been compiled with ROOT support");
 #endif
     } else {
-        throw std::runtime_error("Spectrum: Only histogram fluxes are implemented");
+        throw beam_error("Only histogram fluxes are implemented");
     }
 }
 
@@ -162,7 +163,7 @@ void Spectrum::AchillesHeader(std::ifstream &hist) {
     tokenize(line, tokens);
     spdlog::debug("{}, {}", tokens[0], tokens[1]);
     if(tokens[0] != "units:")
-        throw std::runtime_error("Beam::Spectrum: Invalid file format");
+        throw beam_error("Invalid file format");
     if(tokens[1] == "v/cm^2/POT/MeV") {
         m_units = flux_units::v_cm2_POT_MeV;
     } else if(tokens[1] == "v/cm^2/POT/50MeV") {
@@ -172,7 +173,7 @@ void Spectrum::AchillesHeader(std::ifstream &hist) {
     } else if(tokens[1] == "v/m^2/POT/500MeV") {
         m_units = flux_units::v_m2_POT_500MeV;
     } else {
-        throw std::runtime_error("Beam::Spectrum: Invalid flux units");
+        throw beam_error("Invalid flux units");
     }
 
     // Read in histogram header line
@@ -189,7 +190,7 @@ void Spectrum::MiniBooNEHeader(std::ifstream &hist) {
     if(line.find("cm^2/proton-on-target/50 MeV") != std::string::npos) {
         m_units = flux_units::v_cm2_POT_50MeV;
     } else {
-        throw std::runtime_error("Beam::Spectrum: Invalid flux units");
+        throw beam_error("Invalid flux units");
     }
 
     // Read remainder of header
@@ -203,7 +204,7 @@ void Spectrum::T2KHeader(std::ifstream &hist) {
     if(line.find("cm^{-2}/50MeV") != std::string::npos) {
         m_units = flux_units::cm2_50MeV;
     } else {
-        throw std::runtime_error("Beam::Spectrum: Invalid flux units");
+        throw beam_error("Invalid flux units");
     }
 }
 

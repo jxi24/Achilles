@@ -1,4 +1,5 @@
 #include "Achilles/ParticleInfo.hh"
+#include "Achilles/Exception.hh"
 
 #include <iostream>
 #include <memory>
@@ -82,7 +83,7 @@ bool ParticleInfo::IsCHadron() const noexcept {
 }
 
 double ParticleInfo::GenerateLifeTime() const {
-    throw std::runtime_error("Not Implemented Yet");
+    throw not_implemented_error("Lifetimes for particles are not implemented");
     return 0.0;
 }
 

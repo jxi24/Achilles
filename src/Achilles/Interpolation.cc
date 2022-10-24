@@ -55,11 +55,11 @@ Interp1D::Interp1D(const std::vector<double> &x, const std::vector<double> &y,
                    InterpolationType mode) : kMode{mode}  {
 
     if(!std::is_sorted(x.begin(), x.end()))
-        throw std::runtime_error("Inputs must be increasing.");
+        throw std::logic_error("Inputs must be increasing.");
     if(std::adjacent_find(x.begin(), x.end()) != x.end())
-        throw std::runtime_error("Inputs must all be unique.");
+        throw std::logic_error("Inputs must all be unique.");
     if(x.size() != y.size())
-        throw std::runtime_error("Input and output arrays must be the same size.");
+        throw std::logic_error("Input and output arrays must be the same size.");
 
     knotX = x;
     knotY = y;
@@ -108,13 +108,13 @@ void Interp1D::CubicSpline(const double& derivLeft, const double& derivRight) {
 double Interp1D::operator()(const double& x) const {
     // Ensure the interpolation is initialized first
     if(!kSplineInit && kMode == InterpolationType::CubicSpline)
-        throw std::runtime_error("Interpolation is not initialized!");
+        throw std::logic_error("Interpolation is not initialized!");
 
     // Disallow extrapolation
     if(x > knotX.back()) 
-        throw std::domain_error(fmt::format("Input ({}) greater than maximum value ({})", x, knotX.back()));
+        throw std::out_of_range(fmt::format("Input ({}) greater than maximum value ({})", x, knotX.back()));
     if(x < knotX.front()) 
-        throw std::domain_error(fmt::format("Input ({}) less than minimum value ({})", x, knotX.front()));
+        throw std::out_of_range(fmt::format("Input ({}) less than minimum value ({})", x, knotX.front()));
 
     // Find range by binary_search
     auto idxHigh = static_cast<size_t>(std::distance(knotX.begin(), std::upper_bound(knotX.begin(), knotX.end(), x)));
@@ -156,15 +156,15 @@ Interp2D::Interp2D(const std::vector<double>& x, const std::vector<double>& y,
                    const std::vector<double>& z,
                    InterpolationType mode) : kMode{mode} {
     if(!std::is_sorted(x.begin(), x.end()))
-        throw std::runtime_error("Inputs must be increasing.");
+        throw std::logic_error("Inputs must be increasing.");
     if(std::adjacent_find(x.begin(), x.end()) != x.end())
-        throw std::runtime_error("Inputs must all be unique.");
+        throw std::logic_error("Inputs must all be unique.");
     if(!std::is_sorted(y.begin(), y.end()))
-        throw std::runtime_error("Inputs must be increasing.");
+        throw std::logic_error("Inputs must be increasing.");
     if(std::adjacent_find(y.begin(), y.end()) != y.end())
-        throw std::runtime_error("Inputs must all be unique.");
+        throw std::logic_error("Inputs must all be unique.");
     if(x.size()*y.size() != z.size())
-        throw std::runtime_error("Input and output arrays must be the same size.");
+        throw std::logic_error("Input and output arrays must be the same size.");
 
     knotX = x;
     knotY = y;
@@ -183,17 +183,17 @@ void Interp2D::BicubicSpline() {
 double Interp2D::operator()(const double& x, const double& y) const {
     // Ensure the interpolation is initialized first
     if(!kSplineInit && kMode == InterpolationType::CubicSpline)
-        throw std::runtime_error("Interpolation is not initialized!");
+        throw std::logic_error("Interpolation is not initialized!");
 
     // Disallow extrapolation
     if(x > knotX.back()) 
-        throw std::domain_error(fmt::format("Input ({}) greater than maximum x value ({})", x, knotX.back()));
+        throw std::out_of_range(fmt::format("Input ({}) greater than maximum x value ({})", x, knotX.back()));
     if(x < knotX.front()) 
-        throw std::domain_error(fmt::format("Input ({}) less than minimum x value ({})", x, knotX.front()));
+        throw std::out_of_range(fmt::format("Input ({}) less than minimum x value ({})", x, knotX.front()));
     if(y > knotY.back()) 
-        throw std::domain_error(fmt::format("Input ({}) greater than maximum y value ({})", y, knotY.back()));
+        throw std::out_of_range(fmt::format("Input ({}) greater than maximum y value ({})", y, knotY.back()));
     if(y < knotY.front()) 
-        throw std::domain_error(fmt::format("Input ({}) less than minimum y value ({})", y, knotY.front()));
+        throw std::out_of_range(fmt::format("Input ({}) less than minimum y value ({})", y, knotY.front()));
 
 
     double result = 0;

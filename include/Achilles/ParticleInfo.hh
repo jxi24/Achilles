@@ -159,7 +159,7 @@ namespace achilles {
                 if(it != particleDB.end()) 
                     info = it -> second;
                 else
-                    throw std::runtime_error(fmt::format("Invalid PID: id={}", id));
+                    throw std::logic_error(fmt::format("Invalid PID: id={}", id));
                 if(id < 0 && info -> majorana == 0) anti = true;
             }
 
@@ -171,7 +171,7 @@ namespace achilles {
                 }
                 auto it(particleDB.find(id));
                 if(it == particleDB.end())
-                    throw std::runtime_error(fmt::format("Invalid PID: id={}", int(id)));
+                    throw std::logic_error(fmt::format("Invalid PID: id={}", int(id)));
                 info = it -> second;
                 if(anti_ && info -> majorana == 0) anti = anti_;
             }

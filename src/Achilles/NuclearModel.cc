@@ -1,4 +1,5 @@
 #include "Achilles/NuclearModel.hh"
+#include "Achilles/Exception.hh"
 #include "Achilles/PhaseSpaceBuilder.hh"
 #include "Achilles/FourVector.hh"
 #include "Achilles/Nucleus.hh"
@@ -103,7 +104,8 @@ void Coherent::AllowedStates(Process_Info &info) const {
     charge /= 3;
     spdlog::debug("Charge = {}", charge);
     if(charge != 0)
-        throw std::runtime_error(fmt::format("Coherent: Requires charge 0, but found charge {}", charge));
+        throw nuclear_error("Coherent",
+                            fmt::format("Requires charge 0, but found charge {}", charge));
 
     info.m_states[{nucleus_pid}] = {nucleus_pid}; 
 }
@@ -201,7 +203,8 @@ void QESpectral::AllowedStates(Process_Info &info) const {
     }
     charge /= 3;
     if(std::abs(charge) > 1)
-        throw std::runtime_error(fmt::format("Quasielastic: Requires |charge| < 2, but found |charge| {}", std::abs(charge)));
+        throw nuclear_error("Quasielastic",
+                            fmt::format("Requires |charge| < 2, but found |charge| {}", std::abs(charge)));
 
     switch(charge) {
         case -1: // Final state has less charge than initial

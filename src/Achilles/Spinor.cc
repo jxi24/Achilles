@@ -62,9 +62,9 @@ Spinor Spinor::Bar() const {
 }
 
 SpinMatrix Spinor::outer(const Spinor &other) const {
-    if(m_bar) throw std::runtime_error("LHS spinor should not be barred");
-    if(!other.m_bar) throw std::runtime_error("RHS spinor should be barred");
-    if(m_type != other.m_type) throw std::runtime_error("Both spinors should be u or v");
+    if(m_bar) throw std::logic_error("Achilles::SpinorError: LHS spinor should not be barred");
+    if(!other.m_bar) throw std::logic_error("Achilles::SpinorError: RHS spinor should be barred");
+    if(m_type != other.m_type) throw std::logic_error("Achilles::SpinorError: Both spinors should be u or v");
     
     SpinMatrix s;
 

@@ -13,6 +13,7 @@
 #include "Achilles/NuclearModel.hh"
 #include "Achilles/ComplexFmt.hh"
 #include "Achilles/Units.hh"
+#include "Achilles/Exception.hh"
 
 // TODO: Turn this into a factory to reduce the number of includes
 #include "Achilles/PhaseSpaceBuilder.hh"
@@ -125,7 +126,7 @@ achilles::EventGen::EventGen(const std::string &configFile,
     auto leptonicProcess = config["Process"].as<achilles::Process_Info>();
     // TODO: Handle the beam initial state better
     if(beam -> BeamIDs().size() > 1)
-        throw std::runtime_error("Multiple processes are not implemented yet. Please use only one beam.");
+        throw not_implemented_error("Multiple processes are not implemented yet. Please use only one beam.");
     leptonicProcess.m_ids.insert(leptonicProcess.m_ids.begin(),
                                  beam -> BeamIDs().begin(), beam -> BeamIDs().end());
 
@@ -183,10 +184,11 @@ achilles::EventGen::EventGen(const std::string &configFile,
                                                                        beam, masses);
             integrand.AddChannel(std::move(channel0));
         } else {
-            const std::string error = fmt::format("Leptonic Tensor can only handle 2->2 processes without "
+            const std::string error = fmt::format("Achilles::PhaseSpaceError: "
+                                                  "Leptonic Tensor can only handle 2->2 processes without "
                                                   "BSM being enabled. "
                                                   "Got a 2->{} process", leptonicProcess.m_ids.size());
-            throw std::runtime_error(error);
+            throw std::logic_error(error);
         }
 #else
         auto channels = sherpa -> GenerateChannels(scattering -> Process().Ids());
@@ -235,7 +237,7 @@ achilles::EventGen::EventGen(const std::string &configFile,
     } else {
         std::string msg = fmt::format("Achilles: Invalid output format requested {}",
                                       output["Format"].as<std::string>());
-        throw std::runtime_error(msg);
+        throw std::invalid_argument(msg);
     }
     writer -> WriteHeader(configFile);
 }

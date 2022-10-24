@@ -119,8 +119,8 @@ class FormFactorImpl {
         template<typename Derived>
         static void Validate(FFType other) { 
             if(Derived::Type() != other)
-                throw std::runtime_error(fmt::format("FormFactor: Expected type {}, got type {}",
-                                                     FFTypeToString(Derived::Type()), FFTypeToString(other))); 
+                throw std::invalid_argument(fmt::format("FormFactor: Expected type {}, got type {}",
+                                                        FFTypeToString(Derived::Type()), FFTypeToString(other))); 
         }
 };
 
