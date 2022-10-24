@@ -26,13 +26,13 @@ struct TestCutBase : public achilles::CutBase<T> {
 TEMPLATE_TEST_CASE("Base Cut", "[Cuts]", double, float, size_t, int) {
     SECTION("Check for valid syntax") {
         YAML::Node node;
-        REQUIRE_THROWS_AS(TestCutBase<TestType>(node), std::runtime_error);
+        REQUIRE_THROWS_AS(TestCutBase<TestType>(node), std::logic_error);
         node["min"] = 30;
         REQUIRE_NOTHROW(TestCutBase<TestType>(node));
         node["max"] = 100;
         REQUIRE_NOTHROW(TestCutBase<TestType>(node));
         node["range"] = std::vector<TestType>{30, 50};
-        REQUIRE_THROWS_AS(TestCutBase<TestType>(node), std::runtime_error);
+        REQUIRE_THROWS_AS(TestCutBase<TestType>(node), std::logic_error);
         YAML::Node node2;
         node2["range"] = std::vector<TestType>{30, 50};
         REQUIRE_NOTHROW(TestCutBase<TestType>(node2));

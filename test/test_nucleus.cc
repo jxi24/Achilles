@@ -56,7 +56,7 @@ TEST_CASE("Nucleus construction", "[nucleus]") {
         auto density3 = std::make_unique<MockDensity>();
         REQUIRE_CALL(*density3, GetConfiguration())
             .TIMES(0);
-        std::string errorMsg = "Requires the number of protons to be less than the total";
+        std::string errorMsg = "Achilles::NucleusError: Requires the number of protons to be less than the total";
         errorMsg += " number of nucleons. Got " + std::to_string(A);
         errorMsg += " protons and " + std::to_string(Z) + " nucleons";
         CHECK_THROWS_WITH(achilles::Nucleus(A, Z, 0, 0, dFile, fermiGas, std::move(density3)),
@@ -70,7 +70,7 @@ TEST_CASE("Nucleus construction", "[nucleus]") {
         static constexpr std::size_t Z = 6, A = 12;
 
         CHECK_THROWS_WITH(achilles::Nucleus(Z, A, 0, 0, "dummy.txt", fermiGas, std::move(density)),
-                          "Nucleus: Density file dummy.txt does not exist.");
+                          "Achilles::NucleusError: Density file dummy.txt does not exist.");
     }
 
     SECTION("Density must produce correct number of protons and neutrons") {
@@ -92,14 +92,14 @@ TEST_CASE("Nucleus construction", "[nucleus]") {
             .TIMES(1)
             .RETURN(particles);
         CHECK_THROWS_WITH(achilles::Nucleus(Z, A+1, 0, 0, dFile, fermiGas, std::move(density2)),
-                          "Invalid density function! Incorrect number of nucleons.");
+                          "Achilles::NucleusError: Invalid density function! Incorrect number of nucleons.");
 
         auto density3 = std::make_unique<MockDensity>();
         REQUIRE_CALL(*density3, GetConfiguration())
             .TIMES(1)
             .RETURN(particles);
         CHECK_THROWS_WITH(achilles::Nucleus(Z+1, A, 0, 0, dFile, fermiGas, std::move(density3)),
-                          "Invalid density function! Incorrect number of protons or neutrons.");
+                          "Achilles::NucleusError: Invalid density function! Incorrect number of protons or neutrons.");
     }
 }
 
@@ -180,6 +180,6 @@ TEST_CASE("Make Nucleus", "[Nucleus]") {
         }
         if(!bad_random) 
             CHECK_THROWS_WITH(achilles::Nucleus::MakeNucleus(name, 0, 0, dFile, fermiGas, std::move(density)),
-                              fmt::format("Invalid nucleus: {} does not exist.", match[2]));
+                              fmt::format("Achilles::NucleusError: Invalid nucleus: {} does not exist.", match[2]));
     }
 }

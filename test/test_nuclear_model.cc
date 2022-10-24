@@ -54,7 +54,7 @@ Nucleus:
 
         achilles::Process_Info invalid;
         invalid.m_ids = {achilles::PID::electron(), achilles::PID::nu_electron()};
-        CHECK_THROWS_WITH(model.AllowedStates(invalid), "Coherent: Requires charge 0, but found charge 1");
+        CHECK_THROWS_WITH(model.AllowedStates(invalid), "Achilles::NuclearError:Coherent: Requires charge 0, but found charge 1");
     }
 
     SECTION("CalcCurrents") {
@@ -192,13 +192,13 @@ NuclearModel:
         SECTION("-2 Nuclear Charge") {
             achilles::Process_Info invalid;
             invalid.m_ids = {achilles::PID::electron(), -achilles::PID::electron()};
-            CHECK_THROWS_WITH(model.AllowedStates(invalid), "Quasielastic: Requires |charge| < 2, but found |charge| 2");
+            CHECK_THROWS_WITH(model.AllowedStates(invalid), "Achilles::NuclearError:Quasielastic: Requires |charge| < 2, but found |charge| 2");
         }
 
         SECTION("+2 Nuclear Charge") {
             achilles::Process_Info invalid;
             invalid.m_ids = {-achilles::PID::electron(), achilles::PID::electron()};
-            CHECK_THROWS_WITH(model.AllowedStates(invalid), "Quasielastic: Requires |charge| < 2, but found |charge| 2");
+            CHECK_THROWS_WITH(model.AllowedStates(invalid), "Achilles::NuclearError:Quasielastic: Requires |charge| < 2, but found |charge| 2");
         }
     }
 
