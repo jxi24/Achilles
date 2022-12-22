@@ -71,6 +71,10 @@ Spectrum::Spectrum(const YAML::Node &node) {
         // Calculate Integral
         bool use_width{};
         switch(m_units) {
+            case flux_units::v_m2_POT_GeV:
+                m_energy_units = 1.0/1.0_GeV;
+                use_width = false;
+                break;
             case flux_units::v_m2_POT_500MeV:
                 m_energy_units = 1.0/1.0_GeV;
                 use_width = true;
@@ -171,6 +175,8 @@ void Spectrum::AchillesHeader(std::ifstream &hist) {
         m_units = flux_units::cm2_50MeV;
     } else if(tokens[1] == "v/m^2/POT/500MeV") {
         m_units = flux_units::v_m2_POT_500MeV;
+    } else if(tokens[1] == "v/m^2/POT/GeV") {
+        m_units = flux_units::v_m2_POT_GeV;
     } else {
         throw std::runtime_error("Beam::Spectrum: Invalid flux units");
     }

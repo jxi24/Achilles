@@ -88,6 +88,7 @@ class Spectrum : public FluxType {
 
         enum class flux_units {
             v_m2_POT_500MeV,
+            v_m2_POT_GeV,
             v_nb_POT_MeV,
             v_cm2_POT_MeV,
             v_cm2_POT_50MeV,
